@@ -1,0 +1,69 @@
+name: 'publish'
+
+on:
+  push:
+    branches:
+      - backend
+      - frontend
+
+# This workflow will trigger on each push to the `backend` or 'frontned' branch to automatically test, lint and format the code.
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: install frontend dependencies
+        run: yarn install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: run tauri build
+        run: yarn tauri build --release
+
+      - name: Run Cargo tests
+        run: cd ./src-tauri && cargo test
+
+      - name: Run Cypress tests
+        run: yarn cypress run --headless
+
+      - name: Run Rust lints
+        run: cd ./src-tauri && cargo clippy -- -D warnings
+
+      - name: Format Rust code
+        run: cd ./src-tauri && cargo fmt --all -- --check
+
+      - name: Run ESLint
+        run: cd ./src && npm run lint
+
+      - name: Run Prettier
+        run: cd ./src && npm run format:check
