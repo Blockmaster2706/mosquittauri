@@ -45,8 +45,41 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
           sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+            
       - name: install frontend dependencies
         run: yarn install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/Cypress
+            ~/Library/Caches/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/cypress.config.js', '**/cypress.config.ts', '**/cypress.json') }}
+          
+      - name: install cypress
+        run: yarn cypress install
+
+      - name: Cache Cargo dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('./src-tauri/Cargo.lock') }}
+
+      - name: Cache Cargo build artifacts
+        uses: actions/cache@v3
+        with:
+          path: ./src-tauri/target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('./src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
 
       - name: run tauri build
         run: yarn tauri build
