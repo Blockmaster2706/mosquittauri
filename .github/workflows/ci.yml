@@ -43,6 +43,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 
       - name: install frontend dependencies
         run: yarn install # change this to npm, pnpm or bun depending on which one you use.
@@ -53,8 +54,13 @@ jobs:
       - name: Run Cargo tests
         run: cd ./src-tauri && cargo test --release
 
-      #- name: Run Cypress tests
-      #  run: yarn cypress run --headless
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: yarn dev --no-wait
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 60 # seconds
+          browser: edge
 
       - name: Run Rust lints
         run: cd ./src-tauri && cargo clippy --release -- -D warnings
