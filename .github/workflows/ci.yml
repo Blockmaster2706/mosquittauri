@@ -88,12 +88,10 @@ jobs:
         run: cd ./src-tauri && cargo test --release
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          start: yarn dev --no-wait
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 60 # seconds
-          browser: edge
+        run: |
+          yarn dev --no-wait &  # Start the development server in the background
+          npx wait-on http://localhost:3000 --timeout 60
+          yarn cypress run --browser edge
 
       - name: Run Rust lints
         run: cd ./src-tauri && cargo clippy --release -- -D warnings
