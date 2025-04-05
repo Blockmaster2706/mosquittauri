@@ -87,11 +87,19 @@ jobs:
       - name: Run Cargo tests
         run: cd ./src-tauri && cargo test --release
 
-      - name: Run Cypress tests
+      - name: Run Cypress tests (Edge on Windows)
+        if: runner.os == 'Windows'
         run: |
-          yarn dev &  # Start the development server in the background
-          sleep 30
+          yarn dev --turbopack &  # Start the development server in the background
+          sleep 30  # Give the dev server a few seconds to start
           yarn cypress run --headless --browser edge
+
+      - name: Run Cypress tests (Chrome on macOS/Ubuntu)
+        if: runner.os != 'Windows'
+        run: |
+          yarn dev --turbopack &  # Start the development server in the background
+          sleep 30  # Give the dev server a few seconds to start
+          yarn cypress run --headless --browser chrome
 
       - name: Run Rust lints
         run: cd ./src-tauri && cargo clippy --release -- -D warnings
