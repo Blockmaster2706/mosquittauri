@@ -89,9 +89,9 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          yarn dev --no-wait &  # Start the development server in the background
+          yarn dev &  # Start the development server in the background
           npx wait-on http://localhost:3000 --timeout 60
-          yarn cypress run --browser edge
+          yarn cypress run --headless --browser edge
 
       - name: Run Rust lints
         run: cd ./src-tauri && cargo clippy --release -- -D warnings
