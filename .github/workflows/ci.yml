@@ -90,6 +90,7 @@ jobs:
       - name: Run Cypress tests
         run: |
           yarn dev &  # Start the development server in the background
+          sleep 20
           npx wait-on http://localhost:3000 --timeout 60
           yarn cypress run --headless --browser edge
 
