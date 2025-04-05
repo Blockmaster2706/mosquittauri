@@ -63,7 +63,7 @@ jobs:
         run: cd ./src-tauri && cargo fmt --all -- --check
 
       - name: Run ESLint
-        run: cd && yarn run lint
+        run: yarn run lint
 
       - name: Run Prettier
-        run: cd && yarn run format:check
+        run: yarn run format:check
