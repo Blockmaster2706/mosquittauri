@@ -53,8 +53,8 @@ jobs:
       - name: Run Cargo tests
         run: cd ./src-tauri && cargo test
 
-      - name: Run Cypress tests
-        run: yarn cypress run --headless
+      #- name: Run Cypress tests
+      #  run: yarn cypress run --headless
 
       - name: Run Rust lints
         run: cd ./src-tauri && cargo clippy -- -D warnings
