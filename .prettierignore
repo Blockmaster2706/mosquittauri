@@ -1,0 +1,7 @@
+# Ignore artifacts:
+build
+coverage
+.github/
+.next/
+.husky/
+src-tauri/
