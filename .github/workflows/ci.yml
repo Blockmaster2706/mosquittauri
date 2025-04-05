@@ -51,19 +51,19 @@ jobs:
         run: yarn tauri build
 
       - name: Run Cargo tests
-        run: cd ./src-tauri && cargo test
+        run: cd ./src-tauri && cargo test --release
 
       #- name: Run Cypress tests
       #  run: yarn cypress run --headless
 
       - name: Run Rust lints
-        run: cd ./src-tauri && cargo clippy -- -D warnings
+        run: cd ./src-tauri && cargo clippy --release -- -D warnings
 
       - name: Format Rust code
         run: cd ./src-tauri && cargo fmt --all -- --check
 
       - name: Run ESLint
-        run: cd ./src && npm run lint
+        run: cd && yarn run lint
 
       - name: Run Prettier
-        run: cd ./src && npm run format:check
+        run: cd && yarn run format:check
