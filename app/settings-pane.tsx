@@ -10,7 +10,7 @@ export default function SettingsPage() {
     let connected_label = connected ? <label className="text-green-500 pl-2 pb-5">Connected</label> : <label className="text-red-500 pl-2 pb-5">Disconnected</label>
 
     return (
-        <div className="absolute left-0 top-0 bg-neutral-800 h-full w-[15%] pt-2 pl-2">
+        <div className="w-full bg-neutral-800 h-full pt-2 pl-2 flex flex-col">
             <label className="w-full accent-text flex justify-center content-center align-middle">Mosquittauri</label>
 
             <label className="w-full flex pt-5">Server Address:</label>
@@ -19,10 +19,10 @@ export default function SettingsPage() {
             <label className="w-full flex pt-5">Topic:</label>
             <input className={input_classname} type="text" placeholder="" title="Topic"></input>
 
-            <div className="absolute bottom-5 w-full">
+            <div className="mt-auto mb-5 w-full">
 
                 <label className="w-full flex pt-5">Status: {connected_label}</label>
-                <button onClick={() => {setConnected(!connected)}} className="w-[calc(100%-20px)] h-10 bg-[var(--accent)] text-black border-2 hover:bg-neutral-800 hover:border-[var(--accent)] hover:text-[var(--accent)] duration-100">Connect</button>
+                <button onClick={() => {setConnected(!connected)}} className="w-[calc(100%-20px)] cursor-pointer h-10 bg-[var(--accent)] text-black border-2 hover:bg-neutral-800 border-[var(--accent)] hover:border-[var(--accent)] hover:text-[var(--accent)] duration-100">Connect</button>
             </div>
         </div>
     )
