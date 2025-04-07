@@ -14,7 +14,7 @@ export default function MessageView({messageArray}: MessageViewProps) {
             <ul>
                 {messageArray.map((message, index) => {
                     return (
-                        <li key={index} className="w-full bg-neutral-800 rounded-2xl pl-2 mt-3">
+                        <li key={index} className="w-full bg-neutral-800 rounded-2xl pl-2 mt-3 break-words">
                             {`[${message.topic}] at ${message.timestamp}: ${message.message}`}
                         </li>
                     )
