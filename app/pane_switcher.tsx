@@ -1,10 +1,14 @@
 'use client'
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { DocumentIcon, MQTTIcon } from "./icons";
 
-export default function PaneSwitcher() {
-    const [isShowingLogs, setShowingLogs] = useState(false)
+interface PaneSwitcherProps {
+    isShowingLogs: boolean,
+    setShowingLogs: Dispatch<SetStateAction<boolean>>
+}
+
+export default function PaneSwitcher({isShowingLogs, setShowingLogs}: PaneSwitcherProps) {
 
     const button_classname="mt-auto bottom-5 cursor-pointer bg-neutral-800 w-12 h-12 border-neutral-800 border-none rounded-full text-[var(--accent)] flex justify-center items-center"
 
