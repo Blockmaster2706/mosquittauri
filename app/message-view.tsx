@@ -1,4 +1,4 @@
-export interface message {
+export type message = {
     timestamp: string;
     message: string;
     topic: string;
@@ -20,6 +20,7 @@ export default function MessageView({messageArray}: MessageViewProps) {
                     )
                 })}
             </ul>
+            <div className="w-full h-30"></div>
         </div>
     )
 }

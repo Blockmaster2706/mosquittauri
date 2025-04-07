@@ -1,8 +1,13 @@
 'use client'
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
-export default function SettingsPage() {
+interface SettingsPageProps {
+    topic: string,
+    setTopic: Dispatch<SetStateAction<string>>
+}
+
+export default function SettingsPage({topic, setTopic}: SettingsPageProps) {
     const input_classname = "w-[calc(100%-10px)] bg-transparent text-base text-[--white] border-b-[2px] border-white/50 outline-none transition-opacity duration-300 placeholder:text-white/50 focus:opacity-100 focus:border-[var(--accent)]";
     
     const [connected, setConnected] = useState(false)
@@ -17,7 +22,7 @@ export default function SettingsPage() {
             <input className={input_classname} type="text" placeholder="localhost" title="Server Address"></input>
             
             <label className="w-full flex pt-5">Topic:</label>
-            <input className={input_classname} type="text" placeholder="" title="Topic"></input>
+            <input className={input_classname} type="text" placeholder="" title="Topic" value={topic} onChange={(event) => {setTopic(event.currentTarget.value)}}></input>
 
             <div className="mt-auto mb-5 w-full">
 
