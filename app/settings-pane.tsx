@@ -4,13 +4,13 @@ import { Dispatch, SetStateAction, useState } from "react";
 
 interface SettingsPageProps {
     topic: string,
-    setTopic: Dispatch<SetStateAction<string>>
+    setTopic: Dispatch<SetStateAction<string>>,
+    connected: boolean,
+    setConnected: Dispatch<SetStateAction<boolean>>
 }
 
-export default function SettingsPage({topic, setTopic}: SettingsPageProps) {
+export default function SettingsPage({topic, setTopic, connected, setConnected}: SettingsPageProps) {
     const input_classname = "w-[calc(100%-10px)] bg-transparent text-base text-[--white] border-b-[2px] border-white/50 outline-none transition-opacity duration-300 placeholder:text-white/50 focus:opacity-100 focus:border-[var(--accent)]";
-    
-    const [connected, setConnected] = useState(false)
 
     let connected_label = connected ? <label className="text-green-500 pl-2 pb-5">Connected</label> : <label className="text-red-500 pl-2 pb-5">Disconnected</label>
 
