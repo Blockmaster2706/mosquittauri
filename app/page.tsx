@@ -5,7 +5,7 @@ import MessageView, { message } from "./message-view";
 import PaneSwitcher from "./pane_switcher";
 import PublishBar from "./publish-bar";
 import SettingsPage from "./settings-pane";
-import { listen } from '@tauri-apps/api/event';
+import { listen, UnlistenFn } from '@tauri-apps/api/event';
 
 export default function Home() {
 
@@ -16,7 +16,7 @@ export default function Home() {
   const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([])
 
   useEffect(() => {
-    let unlisten: Function | undefined;
+    let unlisten: UnlistenFn | undefined;
 
     const setupListener = async () => {
       await listen<message>('newMessage', (payload) => {
@@ -33,7 +33,7 @@ export default function Home() {
     };
   }, [])
 
-  let LogsMessageArray = [
+  const LogsMessageArray = [
     {timestamp: "8am", message: "Dies ist ein Logs Test", topic: "test"},
     {timestamp: "9:30am", message: "Logs sind Cool", topic: "test"},
     {timestamp: "10:21am", message: "Mein Mitazubi steht richtig hart auf Baumstämme oder wie man das schreibt", topic: "Holzbrötchen"},

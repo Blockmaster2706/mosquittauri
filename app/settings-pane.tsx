@@ -1,6 +1,6 @@
 'use client'
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 interface SettingsPageProps {
     topic: string,
@@ -12,7 +12,7 @@ interface SettingsPageProps {
 export default function SettingsPage({topic, setTopic, connected, setConnected}: SettingsPageProps) {
     const input_classname = "w-[calc(100%-10px)] bg-transparent text-base text-[--white] border-b-[2px] border-white/50 outline-none transition-opacity duration-300 placeholder:text-white/50 focus:opacity-100 focus:border-[var(--accent)]";
 
-    let connected_label = connected ? <label className="text-green-500 pl-2 pb-5">Connected</label> : <label className="text-red-500 pl-2 pb-5">Disconnected</label>
+    const connected_label = connected ? <label className="text-green-500 pl-2 pb-5">Connected</label> : <label className="text-red-500 pl-2 pb-5">Disconnected</label>
 
     return (
         <div className="w-full bg-neutral-800 h-full pt-2 pl-2 flex flex-col">
