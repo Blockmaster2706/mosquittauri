@@ -12,8 +12,8 @@ export default function PaneSwitcher() {
         <div className="h-full flex flex-col">
             {
                 isShowingLogs ?
-                <button className={button_classname} onClick={() => setShowingLogs(!isShowingLogs)} title="Switch to Logs View"><MQTTIcon className="size-7"/></button>
-                : <button className={button_classname} onClick={() => setShowingLogs(!isShowingLogs)} title="Switch to MQTT View"><DocumentIcon className="size-7"/></button>
+                <button className={button_classname} onClick={() => setShowingLogs(!isShowingLogs)} title="Switch to MQTT View"><DocumentIcon className="size-7"/></button>
+                : <button className={button_classname} onClick={() => setShowingLogs(!isShowingLogs)} title="Switch to Logs View"><MQTTIcon className="size-7"/></button>
             }
         </div>
     )
