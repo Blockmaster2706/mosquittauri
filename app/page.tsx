@@ -11,13 +11,13 @@ export default function Home() {
           <div className="col-start-1 col-span-20 h-screen max-h-screen max-w-screen w-full z-30">
             <SettingsPage/>
           </div>
-          
+
           <div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen">
             <div className="h-screen overflow-y-scroll hide-scrollbar z-10">
               <MessageView/>
             </div>
             <div className="h-[120px] -mt-30 relative flex flex-col">
-              <div className="h-[40px] ml-4 w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
+              <div className="h-[40px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
                 <PublishBar/>
               </div>
             </div>
