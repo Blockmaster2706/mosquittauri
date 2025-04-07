@@ -23,7 +23,7 @@ export default function PublishBar({topic, enabled}: PublishBarProps) {
         setInputValue(''); // Clear the input after submitting
     };
 
-    const handleChange = (event: { target: { value: any; }; }) => {
+    const handleChange = (event: { target: { value: string; }; }) => {
         setInputValue(event.target.value); // Update state on input change
     };
 
