@@ -6,12 +6,7 @@ import PaneSwitcher from "./pane_switcher";
 import PublishBar from "./publish-bar";
 import SettingsPage from "./settings-pane";
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
-
-export type topic = {
-    id: number,
-    name: string,
-    selected: boolean
-}
+import { topic } from "./types";
 
 export default function Home() {
 
@@ -69,7 +64,7 @@ export default function Home() {
             </div>
             <div className="h-[120px] -mt-30 relative flex flex-col">
               <div className="h-[40px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
-                <PublishBar topic={topicList[0]?.name} enabled={isMQTTConnected}/>
+                <PublishBar topicList={topicList} enabled={isMQTTConnected}/>
               </div>
             </div>
           </div>

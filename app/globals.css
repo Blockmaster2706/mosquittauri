@@ -60,3 +60,25 @@ body {
     }
   }
 }
+
+/* styles/global.css (or similar) */
+
+/* This can be deleted because tailwind already accounts for it */
+/* .paginated-dropdown .dropdown-option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.paginated-dropdown .dropdown-option:hover {
+  background-color: #f0f0f0;
+} */
+
+/* If you want to style the scrollbar: */
+.paginated-dropdown .dropdown-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.paginated-dropdown .dropdown-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}

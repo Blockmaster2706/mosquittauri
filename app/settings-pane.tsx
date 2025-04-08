@@ -1,7 +1,7 @@
 'use client'
 
-import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
-import { topic } from "./page";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { topic } from "./types";
 
 interface SettingsPageProps {
     topicList: topic[],
