@@ -116,7 +116,8 @@ body {
 	background-image: var(
 		--backgroundImage
 	); /* Inherit background image from parent */
-	background-size: cover;
+	background-size: contain;
+	background-repeat: no-repeat;
 	background-position: center;
 	opacity: 0.2; /* Adjust for transparency */
 	filter: blur(5px); /* Apply blur filter directly */
