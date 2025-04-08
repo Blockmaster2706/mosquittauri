@@ -60,13 +60,13 @@ function PaginatedDropdown({
 
 	return (
 		<div
-			className="min-w-1/2 break-all h-full relative inline-block text-left border-transparent border-b-neutral-500 border-2 -ml-0.5"
+			className="min-w-1/2 break-all h-full relative inline-block text-left border-transparent border-b-gray50 border-2 -ml-0.5"
 			ref={dropdownRef}
 		>
 			<div className="w-full h-full flex">
 				<button
 					type="button"
-					className="overflow-x-hidden overflow-y-auto break-all max-w-full ml-auto h-full max-h-full inline-flex items-center w-auto rounded-t-md border border-black shadow-sm px-4 py-2 bg-neutral-600 text-sm font-medium text-neutral-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+					className="overflow-x-hidden overflow-y-auto break-all max-w-full ml-auto h-full max-h-full inline-flex items-center w-auto rounded-t-md border border-gray100 shadow-sm px-4 py-2 bg-gray60 text-sm font-medium text-gray20 hover:bg-gray80 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
 					id="menu-button"
 					aria-expanded={isOpen ? "true" : "false"}
 					aria-haspopup="true"
@@ -90,7 +90,7 @@ function PaginatedDropdown({
 			</div>
 
 			<div
-				className={`origin-bottom-right absolute bottom-full right-0 mb-2 w-full rounded-md shadow-lg bg-neutral-600 ring-1 ring-black ring-opacity-5 focus:outline-none z-10 ${
+				className={`origin-bottom-right absolute bottom-full right-0 mb-2 w-full rounded-md shadow-lg bg-gray60 ring-1 ring-gray100 ring-opacity-5 focus:outline-none z-10 ${
 					isOpen ? "" : "hidden"
 				}`}
 				role="menu"
@@ -103,7 +103,7 @@ function PaginatedDropdown({
 						<div
 							key={option.id}
 							onClick={() => handleOptionClick(option)}
-							className="text-neutral-200 block px-4 py-2 text-sm hover:bg-neutral-800 cursor-pointer"
+							className="text-gray20 block px-4 py-2 text-sm hover:bg-gray80 cursor-pointer"
 							role="menuitem"
 							tabIndex={-1}
 							id={`menu-item-${option.id}`}
@@ -120,7 +120,7 @@ function PaginatedDropdown({
 						<button
 							onClick={handlePrevPage}
 							disabled={currentPage === 0}
-							className="px-2 py-1 rounded bg-neutral-600 hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed"
+							className="px-2 py-1 rounded bg-gray60 hover:bg-gray80 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							Prev
 						</button>
@@ -130,7 +130,7 @@ function PaginatedDropdown({
 						<button
 							onClick={handleNextPage}
 							disabled={currentPage === totalPages - 1}
-							className="px-2 py-1 rounded bg-neutral-600 hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed"
+							className="px-2 py-1 rounded bg-gray60 hover:bg-gray80 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							Next
 						</button>

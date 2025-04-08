@@ -145,7 +145,7 @@ export default function Home() {
 						</div>
 					</div>
 				</div>
-				<div className="absolute left-0 bottom-0 h-[120px] w-screen bg-linear-to-b from-transparent via-black to-black z-20" />
+				<div className="absolute left-0 bottom-0 h-[120px] w-screen bg-linear-to-b from-transparent via-gray100 to-gray100 z-20" />
 			</main>
 		</div>
 	);
