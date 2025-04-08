@@ -8,7 +8,7 @@ interface PaneSwitcherProps {
     setShowingLogs: Dispatch<SetStateAction<boolean>>
 }
 
-export default function PaneSwitcher({isShowingLogs, setShowingLogs}: PaneSwitcherProps) {
+export default function SecondarySidebar({isShowingLogs, setShowingLogs}: PaneSwitcherProps) {
 
     const button_classname="mt-auto bottom-5 cursor-pointer bg-neutral-800 w-12 h-12 border-neutral-800 border-none rounded-full text-[var(--accent)] flex justify-center items-center"
 
