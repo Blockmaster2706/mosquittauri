@@ -93,6 +93,12 @@ function PaginatedDropdown({ options, onChange, placeholder = 'Topic', itemsPerP
           ))}
         </div>
 
+        {options.length === 0 && (
+          <div>
+            No Topics have been added.
+          </div>
+        )}
+
         {totalPages > 1 && (
           <div className="flex justify-between items-center px-2 py-1">
             <button
