@@ -64,8 +64,8 @@ export default function Home() {
             <div className="h-screen overflow-y-scroll hide-scrollbar z-10 scroll-pb-40">
               <MessageView messageArray={isLogsPaneActive ? LogsMessageArray : MQTTMessageArray}/>
             </div>
-            <div className="h-[120px] -mt-30 relative flex flex-col">
-              <div className="h-[40px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
+            <div className="h-[122px] -mt-30 relative flex flex-col">
+              <div className="h-[42px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
                 <PublishBar topic={topic} setTopic={setTopic} inputValue={inputValue} setInputValue={setInputValue} topicList={topicList} enabled={isMQTTConnected}/>
               </div>
             </div>
