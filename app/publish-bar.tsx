@@ -37,7 +37,7 @@ export default function PublishBar({topicList, enabled, inputValue, setInputValu
     };
 
     return (
-    <div className="flex">
+    <div className="flex w-full h-full">
         <input
         id="publish-bar"
         title={enabled ? "" : "Not connected to Broker"}

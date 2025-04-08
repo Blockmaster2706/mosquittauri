@@ -52,25 +52,25 @@ function PaginatedDropdown({ options, onChange, placeholder = 'Topic', itemsPerP
   };
 
   return (
-    <div className="relative inline-block text-left border-transparent border-b-neutral-500 border-2 -ml-0.5" ref={dropdownRef}>
-      <div>
+    <div className="min-w-1/2 break-all h-full relative inline-block text-left border-transparent border-b-neutral-500 border-2 -ml-0.5" ref={dropdownRef}>
+      <div className='w-full h-full flex'>
         <button
           type="button"
-          className="inline-flex justify-between items-center w-full rounded-t-md border border-black shadow-sm px-4 py-2 bg-neutral-600 text-sm font-medium text-neutral-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className="overflow-x-hidden overflow-y-auto break-all max-w-full ml-auto h-full max-h-full inline-flex items-center w-auto rounded-t-md border border-black shadow-sm px-4 py-2 bg-neutral-600 text-sm font-medium text-neutral-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           id="menu-button"
           aria-expanded={isOpen ? "true" : "false"}
           aria-haspopup="true"
           onClick={toggleDropdown}
         >
           {selectedOption ? selectedOption.name : placeholder}
-          <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <svg className="-mr-1 ml-2 h-5 w-5 min-5- min-h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
         </button>
       </div>
 
       <div
-        className={`origin-bottom-right absolute bottom-full right-0 mb-2 w-56 rounded-md shadow-lg bg-neutral-500 ring-1 ring-black ring-opacity-5 focus:outline-none z-10 ${
+        className={`origin-bottom-right absolute bottom-full right-0 mb-2 w-full rounded-md shadow-lg bg-neutral-600 ring-1 ring-black ring-opacity-5 focus:outline-none z-10 ${
           isOpen ? '' : 'hidden'
         }`}
         role="menu"
