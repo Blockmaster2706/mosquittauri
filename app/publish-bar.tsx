@@ -1,32 +1,36 @@
 'use client'
 
 import { emit } from "@tauri-apps/api/event";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { message } from "./message-view";
 import { topic } from "./types";
 import PaginatedDropdown from "./paginated-dropdown";
 
 interface PublishBarProps {
     topicList: topic[],
-    enabled: boolean
+    enabled: boolean,
+    inputValue: string,
+    setInputValue: Dispatch<SetStateAction<string>>,
+    topic: topic | null,
+    setTopic: Dispatch<SetStateAction<topic | null>>,
 }
 
-export default function PublishBar({topicList, enabled}: PublishBarProps) {
-    const [inputValue, setInputValue] = useState('');
-    const [topic, setTopic] = useState<topic | null>(null)
+export const handleSubmit = (inputValue: string, topic: topic | null, setInputValue: Dispatch<SetStateAction<string>>) => {
+    // Process the input value
+    const now = new Date();
+    emit<message>("newMessage", {timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), message: inputValue, topic: topic?.name ?? ""})
+    setInputValue(''); // Clear the input after submitting
+};
+
+export default function PublishBar({topicList, enabled, inputValue, setInputValue, topic, setTopic}: PublishBarProps) {
+    
 
     const handleKeyDown = (event: { key: string }) => {
         if (event.key === "Enter") {
-            handleSubmit(inputValue)
+            handleSubmit(inputValue, topic, setInputValue)
         }
     };
 
-    const handleSubmit = (value: string) => {
-        // Process the input value
-        const now = new Date();
-        emit<message>("newMessage", {timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), message: value, topic: topic?.name ?? ""})
-        setInputValue(''); // Clear the input after submitting
-    };
 
     const handleChange = (event: { target: { value: string; }; }) => {
         setInputValue(event.target.value); // Update state on input change
@@ -35,6 +39,7 @@ export default function PublishBar({topicList, enabled}: PublishBarProps) {
     return (
     <div className="flex">
         <input
+        id="publish-bar"
         title={enabled ? "" : "Not connected to Broker"}
         disabled={!(enabled && topic)}
         onKeyDown={handleKeyDown}
