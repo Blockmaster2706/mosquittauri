@@ -12,6 +12,7 @@ export default function Home() {
   const [isLogsPaneActive, setLogsPaneActive] = useState(false)
   const [isMQTTConnected, setIsMQTTConnected] = useState(false)
   const [topic, setTopic] = useState("")
+  const [address, setAddress] = useState("")
 
   const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([])
 
@@ -53,7 +54,7 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-h-screen max-w-screen overflow-hidden">
         <div className="absolute grid grid-cols-100 top-0 left-0 w-screen h-screen max-h-screen max-w-screen">
           <div className="col-start-1 col-span-20 h-screen max-h-screen max-w-screen w-full z-30">
-            <SettingsPage topic={topic} setTopic={setTopic} connected={isMQTTConnected} setConnected={setIsMQTTConnected}/>
+            <SettingsPage topic={topic} setTopic={setTopic} connected={isMQTTConnected} setConnected={setIsMQTTConnected} address={address} setAddress={setAddress}/>
           </div>
 
           <div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen">
