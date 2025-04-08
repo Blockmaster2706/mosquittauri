@@ -3,7 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --accent: #24c8db;
+  --accentHover: #24c8db;
+  --accent: #24c9db93;
 }
 
 @theme inline {
@@ -17,6 +18,8 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accent: #24c8db;
+    --accentHover: #24c9db93;
   }
 }
 
@@ -26,15 +29,34 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.accent-text {
-  color: var(--accent)
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Firefox */
-.hide-scrollbar {
-  scrollbar-width: none;
+@layer base {
+  .accent-text {
+    color: var(--accent)
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Firefox */
+  .hide-scrollbar {
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-theme {
+    /* Firefox */
+    scrollbar-color: var(--accent) var(--color-neutral-800);
+  
+    ::-webkit-scrollbar {
+      background-color: var(--background);
+    }
+  
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--foreground);
+    }
+  
+    ::-webkit-scrollbar-track {
+      background-color: var(--background);
+    }
+  }
 }

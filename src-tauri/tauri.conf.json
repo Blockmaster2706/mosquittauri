@@ -15,7 +15,7 @@
         "title": "mosquittauri",
         "width": 820,
         "height": 600,
-        "minHeight": 400,
+        "minHeight": 600,
         "minWidth": 820,
         "resizable": true,
         "fullscreen": false
