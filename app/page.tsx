@@ -14,6 +14,8 @@ export default function Home() {
   const [isMQTTConnected, setIsMQTTConnected] = useState(false)
   const [topicList, setTopicList] = useState<topic[]>([])
   const [address, setAddress] = useState("")
+  const [inputValue, setInputValue] = useState('');
+  const [topic, setTopic] = useState<topic | null>(null)
 
   const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([])
 
@@ -64,14 +66,14 @@ export default function Home() {
             </div>
             <div className="h-[120px] -mt-30 relative flex flex-col">
               <div className="h-[40px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
-                <PublishBar topicList={topicList} enabled={isMQTTConnected}/>
+                <PublishBar topic={topic} setTopic={setTopic} inputValue={inputValue} setInputValue={setInputValue} topicList={topicList} enabled={isMQTTConnected}/>
               </div>
             </div>
           </div>
 
           <div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
-            <div className="mb-5 -mt-17 h-12 w-12">
-              <SecondarySidebar isShowingLogs={isLogsPaneActive} setShowingLogs={setLogsPaneActive}/>
+            <div className="mb-5 -mt-17 h-34 w-12">
+              <SecondarySidebar sendButtonEnabled={isMQTTConnected} inputValue={inputValue} topic={topic} setInputValue={setInputValue} isShowingLogs={isLogsPaneActive} setShowingLogs={setLogsPaneActive}/>
             </div>
           </div>
 
