@@ -1,64 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --accentHover: #24c8db;
-  --accent: #24c9db93;
+	--background: #ffffff;
+	--foreground: #171717;
+	--accentHover: #24c8db;
+	--accent: #24c9db93;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #24c8db;
-    --accentHover: #24c9db93;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+		--accent: #24c8db;
+		--accentHover: #24c9db93;
+	}
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 @layer base {
-  .accent-text {
-    color: var(--accent)
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Firefox */
-  .hide-scrollbar {
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-theme {
-    /* Firefox */
-    scrollbar-color: var(--accent) var(--color-neutral-800);
-  
-    ::-webkit-scrollbar {
-      background-color: var(--background);
-    }
-  
-    ::-webkit-scrollbar-thumb {
-      background-color: var(--foreground);
-    }
-  
-    ::-webkit-scrollbar-track {
-      background-color: var(--background);
-    }
-  }
+	.accent-text {
+		color: var(--accent);
+	}
+
+	.hide-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Firefox */
+	.hide-scrollbar {
+		scrollbar-width: none;
+	}
+
+	.scrollbar-theme {
+		/* Firefox */
+		scrollbar-color: var(--accent) var(--color-neutral-800);
+
+		::-webkit-scrollbar {
+			background-color: var(--background);
+		}
+
+		::-webkit-scrollbar-thumb {
+			background-color: var(--foreground);
+		}
+
+		::-webkit-scrollbar-track {
+			background-color: var(--background);
+		}
+	}
 }
 
 /* styles/global.css (or similar) */
@@ -75,10 +75,10 @@ body {
 
 /* If you want to style the scrollbar: */
 .paginated-dropdown .dropdown-content::-webkit-scrollbar {
-  width: 8px;
+	width: 8px;
 }
 
 .paginated-dropdown .dropdown-content::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
+	background-color: #ccc;
+	border-radius: 4px;
 }
