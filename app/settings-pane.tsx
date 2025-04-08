@@ -20,10 +20,19 @@ export default function SettingsPage({
 	address,
 	setAddress,
 }: SettingsPageProps) {
+	const themes = ["mosquittauri", "flashbang"];
+	const [currentTheme, setCurrentTheme] = useState("mosquittauri");
+
+	function setTheme(theme: string) {
+		console.log("Setting Theme to: ", theme);
+		document.documentElement.setAttribute("data-theme", theme);
+		setCurrentTheme(theme);
+	}
+
 	const [topic, setTopic] = useState("");
 
 	const input_classname =
-		"w-[calc(100%-10px)] bg-transparent text-base text-[--white] border-b-[2px] border-white/50 outline-none transition-opacity duration-300 placeholder:text-white/50 focus:opacity-100 focus:border-[var(--accent)]";
+		"w-[calc(100%-10px)] bg-transparent text-base text-gray20 border-b-[2px] border-gray20 outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 focus:border-[var(--accent)]";
 
 	const connected_label = connected ? (
 		<label className="text-green-500 pl-2 pb-5">Connected</label>
@@ -55,15 +64,37 @@ export default function SettingsPage({
 		setTopicList(topicListCopy);
 	};
 
-	useEffect(() => {});
+	useEffect(() => {
+		if (
+			window.matchMedia &&
+			window.matchMedia("(prefers-color-scheme: dark)").matches
+		) {
+		} else setTheme("flashbang");
+		setCurrentTheme(
+			document.documentElement.getAttribute("data-theme") || themes[0],
+		);
+	}, []);
 
 	return (
-		<div className="w-full bg-neutral-800 h-full pt-2 pl-2 flex flex-col">
-			<label className="w-full accent-text flex justify-center content-center align-middle">
-				Mosquittauri
-			</label>
+		<div className="w-full bg-gray80 h-full pt-2 pl-2 flex flex-col">
+			<div className="-ml-2 flex gap-2 mb-4 text-gray20 bg-transparent">
+				<select
+					title="Change the Application Theme"
+					className={
+						"ml-auto mr-auto bg-transparent text-base items-center text-accent hover:text-accentHover hover:cursor-pointer outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 appearance-none"
+					}
+					onChange={(e) => setTheme(e.target.value)}
+					value={currentTheme}
+				>
+					{themes.map((theme) => (
+						<option key={theme} value={theme}>
+							{theme.charAt(0).toUpperCase() + theme.slice(1)}
+						</option>
+					))}
+				</select>
+			</div>
 
-			<label className="w-full flex pt-5">Server Address:</label>
+			<label className="w-full flex pt-5 text-gray20">Server Address:</label>
 			<input
 				className={input_classname}
 				type="text"
@@ -74,7 +105,7 @@ export default function SettingsPage({
 				}}
 			></input>
 
-			<label className="w-full flex pt-5">Add new Topic:</label>
+			<label className="w-full flex pt-5 text-gray20">Add new Topic:</label>
 			<input
 				className={input_classname}
 				onKeyDown={handleKeyDown}
@@ -95,10 +126,10 @@ export default function SettingsPage({
 								<button
 									onClick={() => handleClick(topic.id)}
 									className={
-										"w-full border-1 border-black " +
+										"w-full border-1 border-gray100 " +
 										(topic.selected
-											? "bg-[var(--accent)] hover:bg-[var(--accentHover)] text-black"
-											: "bg-neutral-600 hover:bg-neutral-800")
+											? "bg-accent hover:bg-accentHover text-gray100"
+											: "bg-gray60 hover:bg-gray80")
 									}
 								>
 									{topic?.name}
@@ -110,14 +141,16 @@ export default function SettingsPage({
 			</div>
 
 			<div className="mt-auto mb-5 w-full">
-				<label className="w-full flex pt-5">Status: {connected_label}</label>
+				<label className="w-full flex pt-5 text-gray20">
+					Status: {connected_label}
+				</label>
 				<button
 					title={address === "" ? "Please input a Server Address" : ""}
 					disabled={address === ""}
 					onClick={() => {
 						setConnected(!connected);
 					}}
-					className="w-[calc(100%-20px)] cursor-pointer disabled:bg-neutral-600 disabled:text-neutral-300 disabled:border-black disabled:cursor-not-allowed disabled:bg- h-10 bg-[var(--accent)] text-black border-2 enabled:hover:bg-neutral-800 border-[var(--accent)] enabled:hover:border-[var(--accent)] enabled:hover:text-[var(--accent)] duration-100"
+					className="w-[calc(100%-20px)] cursor-pointer disabled:bg-gray60 disabled:text-gray30 disabled:border-gray100 disabled:cursor-not-allowed disabled:bg- h-10 bg-[var(--accent)] text-gray100 border-2 enabled:hover:bg-gray80 border-accent enabled:hover:border-accent enabled:hover:text-accent duration-100"
 				>
 					Connect
 				</button>

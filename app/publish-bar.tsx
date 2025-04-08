@@ -68,7 +68,7 @@ export default function PublishBar({
 						: "Connect to Broker to Publish"
 				}
 				className={
-					"w-full mt-auto bg-transparent text-base text-[--white] border-b-[2px] border-neutral-500 outline-none transition-opacity duration-300 placeholder:text-neutral-500 focus:opacity-100 focus:border-[var(--accent)] " +
+					"w-full mt-auto bg-transparent text-base text-[--white] border-b-[2px] border-gray50 outline-none transition-opacity duration-300 placeholder:text-gray50 focus:opacity-100 focus:border-[var(--accent)] " +
 					(enabled && topic ? "" : "cursor-not-allowed")
 				}
 			></input>

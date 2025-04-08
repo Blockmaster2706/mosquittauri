@@ -23,7 +23,7 @@ export default function SecondarySidebar({
 	sendButtonEnabled,
 }: PaneSwitcherProps) {
 	const button_classname =
-		"mt-auto bottom-5 cursor-pointer bg-neutral-800 w-12 h-12 border-neutral-800 border-none rounded-full text-[var(--accent)] flex justify-center items-center ";
+		"mt-auto bottom-5 cursor-pointer bg-gray80 w-12 h-12 border-gray80 border-none rounded-full text-[var(--accent)] flex justify-center items-center ";
 
 	const disabled_condition = !(sendButtonEnabled && !(topic === null));
 
@@ -48,9 +48,7 @@ export default function SecondarySidebar({
 			)}
 			<button
 				disabled={disabled_condition}
-				className={
-					button_classname + (disabled_condition ? "text-neutral-500" : "")
-				}
+				className={button_classname + (disabled_condition ? "text-gray50" : "")}
 				onClick={() => handleSubmit(inputValue, topic, setInputValue)}
 				title={disabled_condition ? "Please select a Topic" : "Publish Message"}
 			>
