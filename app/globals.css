@@ -2,6 +2,7 @@
 
 :root {
 	--background: #0a0a0a;
+	--backgroundImage: url("/background.png");
 	--foreground: #ededed;
 	--gray20: oklch(92.2% 0 0);
 	--gray30: oklch(87% 0 0);
@@ -16,6 +17,7 @@
 
 @theme inline {
 	--color-background: var(--background);
+	--backgroundImage: url("/background.png");
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
@@ -78,25 +80,14 @@ body {
 }
 
 [data-theme="mosquittauri"] {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
-	--gray20: oklch(92.2% 0 0);
-	--gray30: oklch(87% 0 0);
-	--gray40: oklch(70.8% 0 0);
-	--gray50: oklch(55.6% 0 0);
-	--gray60: oklch(43.9% 0 0);
-	--gray80: oklch(26.9% 0 0);
-	--gray100: #000;
-	--accent: #24c8db;
-	--accentHover: #24c9db93;
+	--backgroundImage: url("/background.png");
 }
 
 [data-theme="flashbang"] {
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
 	--background: #ededed;
+	--backgroundImage: url("/background.png");
 	--foreground: #0a0a0a;
 	--gray20: #000;
 	--gray30: oklch(26.9% 0 0);
@@ -107,6 +98,30 @@ body {
 	--gray100: oklch(92.2% 0 0);
 	--accent: #24c9db93;
 	--accentHover: #24c8db;
+}
+
+.background-image {
+	background-size: cover;
+	background-position: center;
+	position: relative; /* Establish a stacking context */
+}
+
+.background-image::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: var(
+		--backgroundImage
+	); /* Inherit background image from parent */
+	background-size: cover;
+	background-position: center;
+	opacity: 0.2; /* Adjust for transparency */
+	filter: blur(5px); /* Apply blur filter directly */
+	-webkit-filter: blur(5px); /* Vendor prefix for older Safari */
+	z-index: -1; /* Place behind the content */
 }
 
 /* styles/global.css (or similar) */

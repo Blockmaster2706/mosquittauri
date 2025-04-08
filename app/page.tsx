@@ -110,8 +110,8 @@ export default function Home() {
 						/>
 					</div>
 
-					<div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen">
-						<div className="h-screen overflow-y-scroll hide-scrollbar z-10 scroll-pb-40">
+					<div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen background-image">
+						<div className="h-screen overflow-y-scroll hide-scrollbar z-10 scroll-pb-40 message-box">
 							<MessageView
 								messageArray={
 									isLogsPaneActive ? LogsMessageArray : MQTTMessageArray
