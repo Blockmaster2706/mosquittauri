@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import MessageView, { message } from "./message-view";
-import PaneSwitcher from "./pane_switcher";
 import PublishBar from "./publish-bar";
 import SettingsPage from "./settings-pane";
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { topic } from "./types";
+import SecondarySidebar from "./secondary-sidebar";
 
 export default function Home() {
 
@@ -71,7 +71,7 @@ export default function Home() {
 
           <div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
             <div className="mb-5 -mt-17 h-12 w-12">
-              <PaneSwitcher isShowingLogs={isLogsPaneActive} setShowingLogs={setLogsPaneActive}/>
+              <SecondarySidebar isShowingLogs={isLogsPaneActive} setShowingLogs={setLogsPaneActive}/>
             </div>
           </div>
 
