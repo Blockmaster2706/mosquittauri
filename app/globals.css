@@ -100,6 +100,23 @@ body {
 	--accentHover: #24c8db;
 }
 
+[data-theme="UwU"] {
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+	--background: oklch(92.2% 0.1403 335.14);
+	--backgroundImage: url("/uwu_background.png");
+	--foreground: #0a0a0a;
+	--gray20: oklch(12% 0.1403 335.14);
+	--gray30: oklch(26.9% 0.1403 335.14);
+	--gray40: oklch(43.9% 0.1403 335.14);
+	--gray50: oklch(55.6% 0.1403 335.14);
+	--gray60: oklch(0.69 0.1403 335.14);
+	--gray80: oklch(87% 0.1403 335.14);
+	--gray100: oklch(92.2% 0.1403 335.14);
+	--accent: #ff00e1;
+	--accentHover: #ff00e17a;
+}
+
 .background-image {
 	background-size: cover;
 	background-position: center;
