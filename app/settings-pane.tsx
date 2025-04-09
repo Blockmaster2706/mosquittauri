@@ -20,7 +20,7 @@ export default function SettingsPage({
 	address,
 	setAddress,
 }: SettingsPageProps) {
-	const themes = ["mosquittauri", "flashbang"];
+	const themes = ["mosquittauri", "flashbang", "UwU"];
 	const [currentTheme, setCurrentTheme] = useState("mosquittauri");
 
 	function setTheme(theme: string) {
