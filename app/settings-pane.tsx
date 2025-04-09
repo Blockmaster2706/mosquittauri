@@ -81,7 +81,7 @@ export default function SettingsPage({
 				<select
 					title="Change the Application Theme"
 					className={
-						"ml-auto mr-auto bg-transparent text-base items-center text-accent hover:text-accentHover hover:cursor-pointer outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 appearance-none"
+						"text-center ml-auto mr-auto bg-transparent text-base items-center text-accent hover:text-accentHover hover:cursor-pointer outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 appearance-none"
 					}
 					onChange={(e) => setTheme(e.target.value)}
 					value={currentTheme}
