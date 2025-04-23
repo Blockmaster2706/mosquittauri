@@ -23,3 +23,12 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.4.1", features = [] }
 tauri-plugin-log = "2.0.0-rc"
+rumqttc = { version = "0.24.0", default-features = false, features = [
+  "url",
+  "use-native-tls",
+  "proxy",
+  "websocket",
+] }
+sqlx = { version = "0.8.3", features = ["runtime-tokio", "tls-native-tls"] }
+anyhow = "1.0.97"
+chrono = { version = "0.4.40", features = ["serde"] }
