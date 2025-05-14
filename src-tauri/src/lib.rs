@@ -45,7 +45,7 @@ fn test_json_storage() {
     }
 
     print_servers();
-    Server::insert_server(Server::new("example.com", "client"))
+    Server::add(Server::new("example.com", "client"))
         .err()
         .inspect(|e| log::error!("Failed to add server {e:#?}"));
     print_servers();

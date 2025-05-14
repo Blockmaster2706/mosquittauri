@@ -14,7 +14,7 @@ impl MsqtDao for Server {
 }
 
 impl Server {
-    pub fn insert_server(server: Server) -> Result<()> {
+    pub fn add(server: Server) -> Result<()> {
         JsonStorage::try_new("server")?
             .update(|servers| {
                 JsonStorage::insert(servers, server)
