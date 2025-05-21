@@ -1,103 +1,152 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import MessageView, { message } from "./message-view";
+import PublishBar from "./publish-bar";
+import SettingsPage from "./settings-pane";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { topic } from "./types";
+import SecondarySidebar from "./secondary-sidebar";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+	const [isLogsPaneActive, setLogsPaneActive] = useState(false);
+	const [isMQTTConnected, setIsMQTTConnected] = useState(false);
+	const [topicList, setTopicList] = useState<topic[]>([]);
+	const [address, setAddress] = useState("");
+	const [inputValue, setInputValue] = useState("");
+	const [topic, setTopic] = useState<topic | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+	const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([]);
+
+	useEffect(() => {
+		let unlisten: UnlistenFn | undefined;
+
+		const setupListener = async () => {
+			await listen<message>("newMessage", (payload) => {
+				setMQTTMessageArray((prevState) => [...prevState, payload.payload]);
+			});
+		};
+
+		setupListener();
+
+		return () => {
+			if (unlisten) {
+				// Check if unlisten is defined
+				unlisten();
+			}
+		};
+	}, []);
+
+	const LogsMessageArray = [
+		{ timestamp: "8am", message: "Dies ist ein Logs Test", topic: "test" },
+		{ timestamp: "9:30am", message: "Logs sind Cool", topic: "test" },
+		{
+			timestamp: "10:21am",
+			message:
+				"Mein Mitazubi steht richtig hart auf Baumstämme oder wie man das schreibt",
+			topic: "Holzbrötchen",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+		{
+			timestamp: "11:11am",
+			message: "Dies ist ein *weiterer* Logs Test",
+			topic: "test",
+		},
+		{ timestamp: "69am", message: "Lol funny Logs", topic: "hehe" },
+		{
+			timestamp: "420am",
+			message: "Wann gratis Logs für alle, Herr Habeck?",
+			topic: "Brokkologs",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+		{
+			timestamp: "11am",
+			message:
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+			topic: "LoremIpsum",
+		},
+	];
+
+	return (
+		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-h-screen max-w-screen overflow-hidden">
+				<div className="absolute grid grid-cols-100 top-0 left-0 w-screen h-screen max-h-screen max-w-screen">
+					<div className="col-start-1 col-span-20 h-screen max-h-screen max-w-screen w-full z-30">
+						<SettingsPage
+							topicList={topicList}
+							setTopicList={setTopicList}
+							connected={isMQTTConnected}
+							setConnected={setIsMQTTConnected}
+							address={address}
+							setAddress={setAddress}
+						/>
+					</div>
+
+					<div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen background-image">
+						<div className="h-screen overflow-y-scroll hide-scrollbar z-10 scroll-pb-40 message-box">
+							<MessageView
+								messageArray={
+									isLogsPaneActive ? LogsMessageArray : MQTTMessageArray
+								}
+							/>
+						</div>
+						<div className="h-[122px] -mt-30 relative flex flex-col">
+							<div className="h-[42px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
+								<PublishBar
+									topic={topic}
+									setTopic={setTopic}
+									inputValue={inputValue}
+									setInputValue={setInputValue}
+									topicList={topicList}
+									enabled={isMQTTConnected}
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
+						<div className="mb-5 -mt-17 h-34 w-12">
+							<SecondarySidebar
+								sendButtonEnabled={isMQTTConnected}
+								inputValue={inputValue}
+								topic={topic}
+								setInputValue={setInputValue}
+								isShowingLogs={isLogsPaneActive}
+								setShowingLogs={setLogsPaneActive}
+							/>
+						</div>
+					</div>
+				</div>
+				<div className="absolute left-0 bottom-0 h-[120px] w-screen bg-linear-to-b from-transparent via-gray100 to-gray100 z-20" />
+			</main>
+		</div>
+	);
 }
