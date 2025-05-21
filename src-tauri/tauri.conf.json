@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "mosquittauri",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "identifier": "com.mosquittauri.dev",
   "build": {
     "frontendDist": "../out",
@@ -13,14 +13,16 @@
     "windows": [
       {
         "title": "mosquittauri",
-        "width": 800,
+        "width": 820,
         "height": 600,
+        "minHeight": 600,
+        "minWidth": 820,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self'"
     }
   },
   "bundle": {

@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #0a0a0a;
+	--backgroundImage: url("/background.png");
+	--foreground: #ededed;
+	--gray20: oklch(92.2% 0 0);
+	--gray30: oklch(87% 0 0);
+	--gray40: oklch(70.8% 0 0);
+	--gray50: oklch(55.6% 0 0);
+	--gray60: oklch(43.9% 0 0);
+	--gray80: oklch(26.9% 0 0);
+	--gray100: #000;
+	--accent: #24c8db;
+	--accentHover: #24c9db93;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--backgroundImage: url("/background.png");
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+	--color-gray20: var(--gray20);
+	--color-gray30: var(--gray30);
+	--color-gray40: var(--gray40);
+	--color-gray50: var(--gray50);
+	--color-gray60: var(--gray60);
+	--color-gray80: var(--gray80);
+	--color-gray100: var(--gray100);
+	--color-accent: var(--accent);
+	--color-accentHover: var(--accentHover);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+		--accent: #24c8db;
+		--accentHover: #24c9db93;
+	}
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+	.accent-text {
+		color: var(--accent);
+	}
+
+	.hide-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Firefox */
+	.hide-scrollbar {
+		scrollbar-width: none;
+	}
+
+	.scrollbar-theme {
+		/* Firefox */
+		scrollbar-color: var(--accent) var(--color-gray80);
+
+		::-webkit-scrollbar {
+			background-color: var(--background);
+		}
+
+		::-webkit-scrollbar-thumb {
+			background-color: var(--foreground);
+		}
+
+		::-webkit-scrollbar-track {
+			background-color: var(--background);
+		}
+	}
+}
+
+[data-theme="mosquittauri"] {
+	--backgroundImage: url("/background.png");
+}
+
+[data-theme="flashbang"] {
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+	--background: #ededed;
+	--backgroundImage: url("/background.png");
+	--foreground: #0a0a0a;
+	--gray20: #000;
+	--gray30: oklch(26.9% 0 0);
+	--gray40: oklch(43.9% 0 0);
+	--gray50: oklch(55.6% 0 0);
+	--gray60: oklch(70.8% 0 0);
+	--gray80: oklch(87% 0 0);
+	--gray100: oklch(92.2% 0 0);
+	--accent: #24c9db93;
+	--accentHover: #24c8db;
+}
+
+[data-theme="UwU"] {
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+	--background: oklch(92.2% 0.1403 335.14);
+	--backgroundImage: url("/uwu_background.png");
+	--foreground: #0a0a0a;
+	--gray20: oklch(12% 0.1403 335.14);
+	--gray30: oklch(26.9% 0.1403 335.14);
+	--gray40: oklch(43.9% 0.1403 335.14);
+	--gray50: oklch(55.6% 0.1403 335.14);
+	--gray60: oklch(0.69 0.1403 335.14);
+	--gray80: oklch(87% 0.1403 335.14);
+	--gray100: oklch(92.2% 0.1403 335.14);
+	--accent: #ff00e1;
+	--accentHover: #ff00e17a;
+}
+
+.background-image {
+	background-size: cover;
+	background-position: center;
+	position: relative; /* Establish a stacking context */
+}
+
+.background-image::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: var(
+		--backgroundImage
+	); /* Inherit background image from parent */
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	opacity: 0.2; /* Adjust for transparency */
+	filter: blur(5px); /* Apply blur filter directly */
+	-webkit-filter: blur(5px); /* Vendor prefix for older Safari */
+	z-index: -1; /* Place behind the content */
+}
+
+/* styles/global.css (or similar) */
+
+/* This can be deleted because tailwind already accounts for it */
+/* .paginated-dropdown .dropdown-option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.paginated-dropdown .dropdown-option:hover {
+  background-color: #f0f0f0;
+} */
+
+/* If you want to style the scrollbar: */
+.paginated-dropdown .dropdown-content::-webkit-scrollbar {
+	width: 8px;
+}
+
+.paginated-dropdown .dropdown-content::-webkit-scrollbar-thumb {
+	background-color: #ccc;
+	border-radius: 4px;
 }
