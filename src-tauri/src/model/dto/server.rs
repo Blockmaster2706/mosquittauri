@@ -3,33 +3,20 @@ use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Server {
-    id: Option<u64>,
-    url: String,
-    client_id: String,
+    pub(in crate::model) id: u64,
+    pub(in crate::model) url: String,
+    pub(in crate::model) client_id: String,
 }
 
 impl MsqtDto for Server {
-    fn id(&self) -> Option<u64> {
+    fn id(&self) -> u64 {
         self.id
-    }
-    fn init_id(&mut self, id: u64) -> Result<()> {
-        self.check_id_initialized()?;
-        self.id = Some(id);
-        Ok(())
     }
 }
 
 impl Server {
-    pub fn new(url: impl Into<String>, client_id: impl Into<String>) -> Self {
-        Self {
-            id: None,
-            url: url.into(),
-            client_id: client_id.into(),
-        }
-    }
-
     pub fn url(&self) -> &str {
         &self.url
     }

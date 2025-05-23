@@ -46,22 +46,21 @@ impl<T: Serialize + DeserializeOwned + MsqtDto> JsonStorage<T> {
             Vec::new()
         })
     }
-    pub fn gen_new_id(data: &[T]) -> Result<u64> {
-        let Some(last) = data.last() else {
-            return Ok(0);
-        };
-        last.id()
-            .map(|id| id + 1)
-            .context("Last Entry doesn't have an ID")
+    pub fn gen_id(&self) -> Result<u64> {
+        Ok(Self::gen_id_from_data(&self.find_all()?))
     }
-    pub fn insert(data: &mut Vec<T>, mut object: T) -> Result<()> {
-        let id = Self::gen_new_id(data)?;
-        object.init_id(id)?;
+    pub fn gen_id_from_data(data: &[T]) -> u64 {
+        let Some(last) = data.last() else {
+            return 0;
+        };
+        last.id() + 1
+    }
+    pub fn insert(data: &mut Vec<T>, object: T) -> Result<()> {
         data.push(object);
         Ok(())
     }
     pub fn delete(data: &mut [T], id: u64) -> Result<()> {
-        data.iter_mut().filter(|o| o.id() != Some(id)).count();
+        data.iter_mut().filter(|o| o.id() != id).count();
         Ok(())
     }
 }

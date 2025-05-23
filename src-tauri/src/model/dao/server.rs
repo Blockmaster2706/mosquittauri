@@ -14,6 +14,13 @@ impl MsqtDao for Server {
 }
 
 impl Server {
+    pub fn try_new(url: impl Into<String>, client_id: impl Into<String>) -> Result<Self> {
+        Ok(Self {
+            id: JsonStorage::<Server>::try_new("server")?.gen_id()?,
+            url: url.into(),
+            client_id: client_id.into(),
+        })
+    }
     pub fn add(server: Server) -> Result<()> {
         JsonStorage::try_new("server")?
             .update(|servers| {
