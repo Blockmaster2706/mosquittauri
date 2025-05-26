@@ -55,8 +55,8 @@ impl<T: Serialize + DeserializeOwned + MsqtDto> JsonStorage<T> {
         };
         last.id() + 1
     }
-    pub fn insert(data: &mut Vec<T>, object: T) -> Result<()> {
-        data.push(object);
+    pub fn insert(&self, object: T) -> Result<()> {
+        self.update(|data| data.push(object))?;
         Ok(())
     }
     pub fn delete(data: &mut [T], id: u64) -> Result<()> {
