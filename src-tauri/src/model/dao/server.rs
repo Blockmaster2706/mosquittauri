@@ -13,22 +13,20 @@ impl MsqtDao for Server {
     }
 }
 
+pub fn get_storage() -> Result<JsonStorage<Server>> {
+    JsonStorage::try_new("server").context("Failed init server JsonStorage")
+}
+
 impl Server {
     pub fn try_new(url: impl Into<String>, client_id: impl Into<String>) -> Result<Self> {
-        Ok(Self {
+        let server = Self {
             id: JsonStorage::<Server>::try_new("server")?.gen_id()?,
             url: url.into(),
             client_id: client_id.into(),
-        })
-    }
-    pub fn add(server: Server) -> Result<()> {
-        JsonStorage::try_new("server")?
-            .update(|servers| {
-                JsonStorage::insert(servers, server)
-                    .err()
-                    .inspect(|e| log::error!("Failed to add server {e:#?}"));
-            })
+        };
+        get_storage()?
+            .insert(server.clone())
             .context("Failed to add server")?;
-        Ok(())
+        Ok(server)
     }
 }
