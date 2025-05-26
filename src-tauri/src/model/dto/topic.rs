@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Topic {
     pub(in crate::model) id: u64,
     pub(in crate::model) fk_server_id: u64,
