@@ -23,7 +23,7 @@ impl Topic {
             name: name.into(),
             enabled: false,
         };
-        get_storage()?.insert(topic.clone());
+        get_storage()?.insert(topic.clone())?;
         Ok(topic)
     }
 

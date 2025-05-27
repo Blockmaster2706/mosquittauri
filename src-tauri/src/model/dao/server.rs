@@ -18,8 +18,13 @@ pub fn get_storage() -> Result<JsonStorage<Server>> {
 }
 
 impl Server {
-    pub fn try_new(url: impl Into<String>, client_id: impl Into<String>) -> Result<Self> {
+    pub fn try_new(
+        name: impl Into<String>,
+        url: impl Into<String>,
+        client_id: impl Into<String>,
+    ) -> Result<Self> {
         let server = Self {
+            name: name.into(),
             id: JsonStorage::<Server>::try_new("server")?.gen_id()?,
             url: url.into(),
             client_id: client_id.into(),
@@ -28,5 +33,10 @@ impl Server {
             .insert(server.clone())
             .context("Failed to add server")?;
         Ok(server)
+    }
+
+    pub fn delete(id: u64) -> Result<()> {
+        get_storage()?.delete(id)?;
+        Ok(())
     }
 }
