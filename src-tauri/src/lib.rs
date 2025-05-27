@@ -5,6 +5,7 @@ use model::{MsqtDao, Server};
 mod conf;
 mod ipc;
 mod model;
+mod mqtt;
 #[cfg(test)]
 mod test;
 mod utils;
