@@ -10,6 +10,7 @@ use crate::model::{MsqtDao, Server};
     tag = "event",
     content = "data"
 )]
+#[allow(dead_code)]
 pub enum ServerEvent {
     Update { list: Vec<Server> },
     Selected { id: u64 },

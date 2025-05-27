@@ -11,12 +11,14 @@ use rumqttc::{Client, Connection, ConnectionError, Event, Packet, Publish};
 use tauri::async_runtime::Sender;
 
 pub struct MqttConnection {
+    #[allow(dead_code)]
     client: Client,
     connection: Connection,
     publish_sender: Sender<Publish>,
     running: Arc<AtomicBool>,
 }
 
+#[allow(dead_code)]
 impl MqttConnection {
     pub fn new(
         client: Client,

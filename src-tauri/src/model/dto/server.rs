@@ -16,6 +16,7 @@ impl MsqtDto for Server {
     }
 }
 
+#[allow(dead_code)]
 impl Server {
     pub fn url(&self) -> &str {
         &self.url

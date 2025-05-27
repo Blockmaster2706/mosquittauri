@@ -17,9 +17,11 @@ impl MsqtDto for Topic {
 }
 
 impl Topic {
+    #[allow(dead_code)]
     pub fn server_id(&self) -> u64 {
         self.fk_server_id
     }
+    #[allow(dead_code)]
     pub fn name(&self) -> &str {
         &self.name
     }

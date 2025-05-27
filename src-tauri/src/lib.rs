@@ -1,6 +1,5 @@
 use anyhow::{Context, Result};
 use chrono::Local;
-use model::{MsqtDao, Server};
 
 mod conf;
 mod ipc;
@@ -14,6 +13,12 @@ mod utils;
 pub fn run() -> Result<()> {
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1"); // Disable dmabuf renderer for WebKitGTK so that the program starts correctly on all Linux Distros including Fedora
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            ipc::add_server,
+            ipc::edit_server,
+            ipc::delete_server,
+            ipc::select_server
+        ])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

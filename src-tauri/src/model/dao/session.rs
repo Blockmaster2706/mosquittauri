@@ -15,6 +15,7 @@ impl MsqtDao for Session {
 }
 
 impl Session {
+    #[allow(dead_code)]
     pub fn get_or_init() -> Result<Self> {
         if let Ok(session) = Self::find_by_id(0) {
             return Ok(session);
@@ -23,6 +24,7 @@ impl Session {
         get_storage()?.insert(session.clone())?;
         Ok(session)
     }
+    #[allow(dead_code)]
     pub fn select_server(server_id: u64) -> Result<()> {
         get_storage()?
             .update(|list| {
