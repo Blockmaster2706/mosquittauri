@@ -25,6 +25,7 @@ impl MsqtDto for Session {
     }
 }
 
+#[allow(dead_code)]
 impl Session {
     fn server_id(&self) -> Option<u64> {
         self.fk_selected_server_id

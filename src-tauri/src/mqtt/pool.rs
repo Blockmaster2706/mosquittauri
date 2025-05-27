@@ -15,6 +15,7 @@ use crate::model::Message;
 
 use super::MqttConnection;
 
+#[allow(dead_code)]
 pub struct MqttPool {
     options: MqttOptions,
     connections: Vec<MqttConnection>,
@@ -25,6 +26,7 @@ pub struct MqttPool {
     capacity: usize,
 }
 
+#[allow(dead_code)]
 impl MqttPool {
     pub fn new(options: MqttOptions) -> Self {
         let running = Arc::new(AtomicBool::new(true));
@@ -61,6 +63,7 @@ impl MqttPool {
             while running.load(Ordering::Relaxed) {
                 let mut packets = Vec::new();
                 receiver.blocking_recv_many(&mut packets, 96);
+                #[allow(unused_variables)]
                 let messages: Vec<Message> = packets
                     .into_iter()
                     .filter_map(|publish: Publish| -> Option<Message> {
@@ -73,6 +76,7 @@ impl MqttPool {
                         }
                     })
                     .collect();
+                // TDDO: Send Event to frontend
                 sleep(Duration::from_secs(2));
             }
         });

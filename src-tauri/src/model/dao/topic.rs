@@ -15,6 +15,7 @@ impl MsqtDao for Topic {
     }
 }
 
+#[allow(dead_code)]
 impl Topic {
     pub fn try_new(server_id: impl Into<u64>, name: impl Into<String>) -> Result<Self> {
         let topic = Self {
