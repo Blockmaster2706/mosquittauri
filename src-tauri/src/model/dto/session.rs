@@ -24,3 +24,9 @@ impl MsqtDto for Session {
         self.id
     }
 }
+
+impl Session {
+    fn server_id(&self) -> Option<u64> {
+        self.fk_selected_server_id
+    }
+}

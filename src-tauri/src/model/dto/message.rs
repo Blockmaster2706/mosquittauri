@@ -23,6 +23,6 @@ impl TryFrom<Publish> for Message {
         let topic = pkt.topic;
         let payload =
             String::from_utf8(pkt.payload.to_vec()).context("Failed to parse mqtt payload")?;
-        return Message::try_new(topic, payload);
+        Message::try_new(topic, payload)
     }
 }

@@ -30,9 +30,9 @@ impl<T: Serialize + DeserializeOwned + MsqtDto> JsonStorage<T> {
         })
     }
 
-    pub fn update(&self, action: impl FnOnce(&mut Vec<T>)) -> Result<Vec<T>> {
+    pub fn update(&self, action: impl FnOnce(&mut Vec<T>) -> Result<()>) -> Result<Vec<T>> {
         let mut data: Vec<T> = self.find_all()?;
-        action(&mut data);
+        action(&mut data)?;
         let new_json = serde_json::to_string_pretty(&data)?;
         fs::write(&self.storage_file, new_json)?;
         Ok(data)
@@ -56,11 +56,33 @@ impl<T: Serialize + DeserializeOwned + MsqtDto> JsonStorage<T> {
         last.id() + 1
     }
     pub fn insert(&self, object: T) -> Result<()> {
-        self.update(|data| data.push(object))?;
+        self.update(|data| {
+            data.push(object);
+            Ok(())
+        })?;
         Ok(())
     }
-    pub fn delete(data: &mut [T], id: u64) -> Result<()> {
-        data.iter_mut().filter(|o| o.id() != id).count();
+    pub fn edit(&self, id: u64, action: impl FnOnce(&mut T)) -> Result<()> {
+        self.update(|data| {
+            action(
+                data.iter_mut()
+                    .find(|obj| obj.id() == id)
+                    .context(format!("No object with id {id}"))?,
+            );
+            Ok(())
+        })?;
+        Ok(())
+    }
+    pub fn delete(&self, id: u64) -> Result<()> {
+        self.update(|list| {
+            let index = list
+                .iter()
+                .position(|obj| obj.id() != id)
+                .context(format!("No {} with the id {id}", self.name))?;
+            list.remove(index);
+
+            Ok(())
+        })?;
         Ok(())
     }
 }

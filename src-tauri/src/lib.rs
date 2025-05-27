@@ -2,10 +2,11 @@ use anyhow::{Context, Result};
 use chrono::Local;
 use model::{MsqtDao, Server};
 
-mod commands;
 mod conf;
-mod events;
+mod ipc;
 mod model;
+#[cfg(test)]
+mod test;
 mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -31,24 +32,9 @@ pub fn run() -> Result<()> {
                         .build(),
                 )?;
             }
-            test_json_storage();
             Ok(())
         })
         .run(tauri::generate_context!())
         .context("error while running tauri application")?;
     Ok(())
-}
-
-fn test_json_storage() {
-    fn print_servers() {
-        println!("{:?}", Server::find_all());
-    }
-
-    print_servers();
-    Server::try_new("example.com", "client")
-        .err()
-        .inspect(|e| log::error!("Failed to add server {e:#?}"));
-    print_servers();
-
-    log::info!("Test sucessful")
 }
