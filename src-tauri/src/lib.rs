@@ -28,7 +28,7 @@ pub fn run() -> Result<()> {
                             let now = Local::now();
                             out.finish(format_args!(
                                 "{}|{}|{}|{}|{}",
-                                now.format("%Y.%M.%D"),
+                                now.format("%Y.%m.%d"),
                                 now.format("%H:%M:%S"),
                                 record.module_path().unwrap_or("???"),
                                 record.level(),
