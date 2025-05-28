@@ -21,12 +21,14 @@ impl Server {
     pub fn try_new(
         name: impl Into<String>,
         url: impl Into<String>,
+        port: u16,
         client_id: impl Into<String>,
     ) -> Result<Self> {
         let server = Self {
             name: name.into(),
             id: JsonStorage::<Server>::try_new("server")?.gen_id()?,
             url: url.into(),
+            port,
             client_id: client_id.into(),
         };
         get_storage()?
