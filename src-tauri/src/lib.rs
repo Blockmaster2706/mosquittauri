@@ -1,5 +1,9 @@
+#![warn(clippy::all)]
+
 use anyhow::{Context, Result};
 use chrono::Local;
+
+use ipc::commands;
 
 mod conf;
 mod ipc;
@@ -14,10 +18,10 @@ pub fn run() -> Result<()> {
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1"); // Disable dmabuf renderer for WebKitGTK so that the program starts correctly on all Linux Distros including Fedora
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            ipc::add_server,
-            ipc::edit_server,
-            ipc::delete_server,
-            ipc::select_server
+            commands::add_server,
+            commands::edit_server,
+            commands::delete_server,
+            commands::select_server
         ])
         .setup(|app| {
             if cfg!(debug_assertions) {

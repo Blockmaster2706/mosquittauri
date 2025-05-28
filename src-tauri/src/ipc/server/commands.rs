@@ -1,32 +1,33 @@
-use tauri::{ipc::Channel, Url};
+use tauri::{AppHandle, Url};
 
 use crate::model::{Server, Session};
 
-use super::events::{send_error, update_servers, ServerEvent};
+use super::events::{ServerError, ServerSelected, ServerUpdate};
 
 #[tauri::command]
 pub async fn add_server(
     name: String,
     url: Url,
+    port: u16,
     client_id: String,
-    on_event: Channel<ServerEvent>,
+    app: AppHandle,
 ) -> tauri::Result<()> {
     // on_event.send()
-    if let Err(e) = Server::try_new(name, url, client_id) {
+    if let Err(e) = Server::try_new(name, url, port, client_id) {
         log::error!("Failed to create server: {e}");
-        send_error(&on_event, &e);
+        ServerError::send(&app, &e);
     }
-    update_servers(&on_event)?;
+    ServerUpdate::send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
-pub async fn select_server(id: u64, on_event: Channel<ServerEvent>) -> tauri::Result<()> {
-    // on_event.send()
+pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
     if let Err(e) = Session::select_server(id) {
         log::error!("Failed to create server: {e}");
-        send_error(&on_event, &e);
+        ServerError::send(&app, &e);
     }
+    ServerSelected::send(&app, id);
     Ok(())
 }
 
@@ -34,21 +35,23 @@ pub async fn select_server(id: u64, on_event: Channel<ServerEvent>) -> tauri::Re
 pub async fn edit_server(
     name: String,
     url: Url,
+    port: u16,
     client_id: String,
-    on_event: Channel<ServerEvent>,
+    app: AppHandle,
 ) -> tauri::Result<()> {
     // on_event.send()
-    Server::try_new(name, url, client_id)
+    Server::try_new(name, url, port, client_id)
         .inspect_err(|e| log::error!("Failed to create server: {e}"))?;
-    update_servers(&on_event)?;
+    ServerUpdate::send(&app)?;
     Ok(())
 }
+
 #[tauri::command]
-pub async fn delete_server(id: u64, on_event: Channel<ServerEvent>) -> tauri::Result<()> {
+pub async fn delete_server(id: u64, app: AppHandle) -> tauri::Result<()> {
     // on_event.send()
     if let Err(e) = Server::delete(id) {
         log::error!("Failed to create server: {e}");
-        send_error(&on_event, &e);
+        ServerError::send(&app, &e);
     }
     Ok(())
 }

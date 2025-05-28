@@ -1,3 +1,5 @@
+use anyhow::Result;
+
 use crate::model::{MsqtDao, Server};
 
 fn print_servers() {
@@ -5,10 +7,11 @@ fn print_servers() {
 }
 
 #[test]
-fn test_json_storage() {
+fn test_json_storage() -> Result<()> {
     print_servers();
-    Server::try_new("example", "example.com", "client")
+    Server::try_new("example", "example.com", 1883_u16, "client")
         .err()
         .inspect(|e| log::error!("Failed to add server {e:#?}"));
     print_servers();
+    Ok(())
 }
