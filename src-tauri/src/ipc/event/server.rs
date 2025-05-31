@@ -3,6 +3,8 @@ use tauri::{AppHandle, Emitter};
 
 use crate::model::{MsqtDao, Server};
 
+// include!("../../../gen/proto/event.server.v1.rs");
+
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerUpdate {

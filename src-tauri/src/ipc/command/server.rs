@@ -1,8 +1,7 @@
 use tauri::{AppHandle, Url};
 
+use crate::ipc::event::{ServerError, ServerSelected, ServerUpdate};
 use crate::model::{Server, Session};
-
-use super::events::{ServerError, ServerSelected, ServerUpdate};
 
 #[tauri::command]
 pub async fn add_server(
