@@ -1,4 +1,5 @@
 mod json_storage;
 mod log;
 
-pub use json_storage::JsonStorage;
+#[allow(unused_imports)]
+pub use json_storage::{JsonStorage, JsonStorageLock};

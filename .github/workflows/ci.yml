@@ -85,7 +85,7 @@ jobs:
         run: yarn tauri build
 
       - name: Run Cargo tests
-        run: cd ./src-tauri && cargo test --release -- --test-threads=1
+        run: cd ./src-tauri && cargo test --release --
 
       - name: Run Cypress tests (Edge on Windows)
         if: runner.os == 'Windows'

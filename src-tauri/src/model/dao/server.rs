@@ -1,20 +1,18 @@
 use anyhow::{Context, Result};
 
-use crate::{model::Server, utils::JsonStorage};
+use crate::{model::Server, utils::JsonStorageLock};
 
 use super::MsqtDao;
 
+static STORAGE: JsonStorageLock<Server> = JsonStorageLock::new("server");
+
 impl MsqtDao for Server {
     fn find_all() -> Result<Vec<Server>> {
-        JsonStorage::try_new("server")
-            .context("Failed to init JsonStorage")?
+        STORAGE
+            .get()?
             .find_all()
             .context("Failed to get full server list")
     }
-}
-
-pub fn get_storage() -> Result<JsonStorage<Server>> {
-    JsonStorage::try_new("server").context("Failed init server JsonStorage")
 }
 
 impl Server {
@@ -26,19 +24,20 @@ impl Server {
     ) -> Result<Self> {
         let server = Self {
             name: name.into(),
-            id: JsonStorage::<Server>::try_new("server")?.gen_id()?,
+            id: STORAGE.get()?.gen_id()?,
             url: url.into(),
             port,
             client_id: client_id.into(),
         };
-        get_storage()?
+        STORAGE
+            .get_mut()?
             .insert(server.clone())
             .context("Failed to add server")?;
         Ok(server)
     }
 
     pub fn delete(id: u64) -> Result<()> {
-        get_storage()?.delete(id)?;
+        STORAGE.get_mut()?.delete(id)?;
         Ok(())
     }
 
@@ -49,7 +48,7 @@ impl Server {
         port: u16,
         client_id: impl Into<String>,
     ) -> Result<()> {
-        get_storage()?.edit(id, |server| {
+        STORAGE.get_mut()?.edit(id, |server| {
             server.name = name.into();
             server.url = url.into();
             server.port = port;
