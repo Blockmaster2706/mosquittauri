@@ -37,6 +37,5 @@ prost = { version = "0.13.5", features = ["derive"] }
 prost-types = "0.13.5"
 
 [dev-dependencies]
-env_logger = "0.11.8"
 ntest = "0.9.3"
 test-context = "0.4.1"

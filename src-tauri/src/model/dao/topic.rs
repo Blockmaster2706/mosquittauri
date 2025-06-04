@@ -3,16 +3,15 @@ use anyhow::{Context, Result};
 use super::MsqtDao;
 use crate::{
     model::{Session, Topic},
-    utils::JsonStorage,
+    utils::JsonStorageLock,
 };
 
-fn get_storage() -> Result<JsonStorage<Topic>> {
-    JsonStorage::<Topic>::try_new("topic").context("Failed to init JsonStorage of topic")
-}
+static STORAGE: JsonStorageLock<Topic> = JsonStorageLock::new("topic");
 
 impl MsqtDao for Topic {
     fn find_all() -> Result<Vec<Topic>> {
-        get_storage()?
+        STORAGE
+            .get()?
             .find_all()
             .context("Failed to get full server list")
     }
@@ -22,21 +21,25 @@ impl MsqtDao for Topic {
 impl Topic {
     pub fn try_new(server_id: impl Into<u64>, name: impl Into<String>) -> Result<Self> {
         let topic = Self {
-            id: get_storage()?.gen_id()?,
+            id: STORAGE.get()?.gen_id()?,
             fk_server_id: server_id.into(),
             name: name.into(),
             enabled: false,
         };
-        get_storage()?.insert(topic.clone())?;
+        STORAGE.get_mut()?.insert(topic.clone())?;
         Ok(topic)
     }
 
     pub fn update(id: u64, name: impl Into<String>) -> Result<()> {
-        get_storage()?.edit(id, |topic| topic.name = name.into())
+        STORAGE
+            .get_mut()?
+            .edit(id, |topic| topic.name = name.into())
     }
 
     pub fn set_enabled(topic_id: u64, enabled: bool) -> Result<()> {
-        get_storage()?.edit(topic_id, |topic| topic.enabled = enabled)
+        STORAGE
+            .get_mut()?
+            .edit(topic_id, |topic| topic.enabled = enabled)
     }
 
     pub fn find_enabled(server_id: u64) -> Result<Vec<Topic>> {
@@ -66,6 +69,6 @@ impl Topic {
     }
 
     pub fn delete(id: u64) -> Result<()> {
-        get_storage()?.delete(id)
+        STORAGE.get_mut()?.delete(id)
     }
 }
