@@ -32,6 +32,7 @@ pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
 
 #[tauri::command]
 pub async fn edit_server(
+    id: u64,
     name: String,
     url: Url,
     port: u16,
@@ -39,8 +40,14 @@ pub async fn edit_server(
     app: AppHandle,
 ) -> tauri::Result<()> {
     // on_event.send()
-    Server::try_new(name, url, port, client_id)
+    Server::update(id, name, url, port, client_id)
         .inspect_err(|e| log::error!("Failed to create server: {e}"))?;
+    ServerUpdate::send(&app)?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
     ServerUpdate::send(&app)?;
     Ok(())
 }

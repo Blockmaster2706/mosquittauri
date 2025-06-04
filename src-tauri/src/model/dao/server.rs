@@ -41,4 +41,27 @@ impl Server {
         get_storage()?.delete(id)?;
         Ok(())
     }
+
+    pub fn update(
+        id: u64,
+        name: impl Into<String>,
+        url: impl Into<String>,
+        port: u16,
+        client_id: impl Into<String>,
+    ) -> Result<()> {
+        get_storage()?.edit(id, |server| {
+            server.name = name.into();
+            server.url = url.into();
+            server.port = port;
+            server.client_id = client_id.into();
+        })
+    }
+
+    #[allow(dead_code)]
+    pub fn find_by_name(name: &str) -> Result<Self> {
+        Self::find_all()?
+            .into_iter()
+            .find(|server| server.name == name)
+            .context(format!("No Server named {name} found"))
+    }
 }
