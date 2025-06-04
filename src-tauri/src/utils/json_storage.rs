@@ -62,7 +62,6 @@ impl<T: Serialize + DeserializeOwned + MsqtDto> JsonStorage<T> {
         })?;
         Ok(())
     }
-    #[allow(dead_code)]
     pub fn edit(&self, id: u64, action: impl FnOnce(&mut T)) -> Result<()> {
         self.update(|data| {
             action(

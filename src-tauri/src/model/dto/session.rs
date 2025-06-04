@@ -6,6 +6,7 @@ use super::MsqtDto;
 pub struct Session {
     pub(in crate::model) id: u64,
     pub(in crate::model) fk_selected_server_id: Option<u64>,
+    pub(in crate::model) all_topics: bool,
     pub(in crate::model) connected: bool,
 }
 
@@ -14,6 +15,7 @@ impl Default for Session {
         Self {
             id: 0,
             fk_selected_server_id: None,
+            all_topics: false,
             connected: true,
         }
     }
@@ -27,7 +29,13 @@ impl MsqtDto for Session {
 
 #[allow(dead_code)]
 impl Session {
-    fn server_id(&self) -> Option<u64> {
+    pub fn server_id(&self) -> Option<u64> {
         self.fk_selected_server_id
+    }
+    pub fn listen_all_topics(&self) -> bool {
+        self.all_topics
+    }
+    pub fn connected(&self) -> bool {
+        self.connected
     }
 }

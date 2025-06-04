@@ -22,12 +22,6 @@ pub async fn add_server(
 }
 
 #[tauri::command]
-pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
-    ServerUpdate::send(&app)?;
-    Ok(())
-}
-
-#[tauri::command]
 pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
     if let Err(e) = Session::select_server(id) {
         log::error!("Failed to create server: {e}");
