@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
 
 export type message = {
 	timestamp: string;
