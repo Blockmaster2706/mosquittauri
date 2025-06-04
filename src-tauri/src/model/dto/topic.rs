@@ -16,6 +16,7 @@ impl MsqtDto for Topic {
     }
 }
 
+#[allow(dead_code)]
 impl Topic {
     pub fn server_id(&self) -> u64 {
         self.fk_server_id
