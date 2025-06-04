@@ -52,7 +52,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-
-            
+
       - name: install frontend dependencies
         run: yarn install # change this to npm, pnpm or bun depending on which one you use.
 
@@ -63,7 +63,7 @@ jobs:
             ~/.cache/Cypress
             ~/Library/Caches/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('**/cypress.config.js', '**/cypress.config.ts', '**/cypress.json') }}
-          
+
       - name: install cypress
         run: yarn cypress install
 
@@ -85,7 +85,7 @@ jobs:
         run: yarn tauri build
 
       - name: Run Cargo tests
-        run: cd ./src-tauri && cargo test --release
+        run: cd ./src-tauri && cargo test --release -- --test-threads=1
 
       - name: Run Cypress tests (Edge on Windows)
         if: runner.os == 'Windows'
