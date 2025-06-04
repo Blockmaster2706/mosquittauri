@@ -37,8 +37,6 @@ export default function Home() {
 		};
 	}, []);
 
-	
-
 	return (
 		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
 			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-h-screen max-w-screen overflow-hidden">
@@ -55,12 +53,10 @@ export default function Home() {
 
 					<div className="col-start-22 col-span-70 w-full flex flex-col h-screen max-h-screen max-w-screen bg-gray100 background-image z-20">
 						<div className="h-screen overflow-y-scroll hide-scrollbar z-20 scroll-pb-40 message-box">
-							{
-								!isLogsPaneActive && <MessageView messageArray={MQTTMessageArray}/>
-							}
-							{
-								isLogsPaneActive && <LogsMessageView/>
-							}
+							{!isLogsPaneActive && (
+								<MessageView messageArray={MQTTMessageArray} />
+							)}
+							{isLogsPaneActive && <LogsMessageView />}
 						</div>
 						<div className="h-[122px] -mt-30 relative flex flex-col">
 							<div className="h-[42px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
