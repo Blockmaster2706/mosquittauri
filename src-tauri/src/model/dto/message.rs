@@ -26,3 +26,10 @@ impl TryFrom<Publish> for Message {
         Message::try_new(topic, payload)
     }
 }
+
+#[allow(dead_code)]
+impl Message {
+    pub fn payload(&self) -> &str {
+        &self.payload
+    }
+}
