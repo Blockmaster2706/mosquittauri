@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use super::MsqtDto;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Server {
     pub(in crate::model) id: u64,
     pub(in crate::model) name: String,

@@ -17,7 +17,6 @@ impl MsqtDao for Topic {
     }
 }
 
-#[allow(dead_code)]
 impl Topic {
     pub fn try_new(server_id: impl Into<u64>, name: impl Into<String>) -> Result<Self> {
         let topic = Self {
@@ -42,7 +41,7 @@ impl Topic {
             .edit(topic_id, |topic| topic.enabled = enabled)
     }
 
-    pub fn find_enabled(server_id: u64) -> Result<Vec<Topic>> {
+    pub fn find_enabled_by_server(server_id: u64) -> Result<Vec<Topic>> {
         Ok(Self::find_all()?
             .into_iter()
             .filter(|t: &Topic| t.enabled && t.server_id() == server_id)
