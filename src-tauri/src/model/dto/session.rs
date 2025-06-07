@@ -17,7 +17,7 @@ impl Default for Session {
             id: 0,
             fk_selected_server_id: None,
             listen_all_topics: false,
-            connected: true,
+            connected: false,
         }
     }
 }
