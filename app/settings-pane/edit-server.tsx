@@ -1,20 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { settingsButtonClassname } from "./settings-pane";
+import { Server } from "../types/server";
 
-interface AddServerProps {
+interface EditServerProps {
 	input_classname: string;
 	onBackClick: () => void;
-	onAddClick: (name: string, url: string, port: number) => void;
+	onAddClick: (server: Server) => void;
+	server: Server;
 }
 
-export default function AddServer({
+export default function EditServer({
 	input_classname,
 	onBackClick,
 	onAddClick,
-}: AddServerProps) {
-	const [serverName, setServerName] = useState("");
-	const [serverAddress, setServerAddress] = useState("");
-	const [serverPort, setServerPort] = useState("1883");
+	server,
+}: EditServerProps) {
+	const [serverName, setServerName] = useState(server.name);
+	const [serverAddress, setServerAddress] = useState(server.url);
+	const [serverPort, setServerPort] = useState(server.port.toString());
+	const [serverClientId, setServerClientId] = useState(server.clientId);
+
+	useEffect(() => {
+		setServerName(server.name);
+		setServerAddress(server.url);
+		setServerPort(server.port.toString());
+		setServerClientId(server.clientId);
+	}, [server]);
 
 	return (
 		<div
@@ -26,7 +37,7 @@ export default function AddServer({
 				}
 			}}
 		>
-			<label className="w-full flex pt-5 text-gray20">Adding Server:</label>
+			<label className="w-full flex pt-5 text-gray20">Editing Server:</label>
 			<label className="w-full flex pt-5 text-gray20">Name:</label>
 			<input
 				className={input_classname}
@@ -63,11 +74,17 @@ export default function AddServer({
 			<button
 				className={settingsButtonClassname + " mt-5"}
 				onClick={() =>
-					onAddClick(serverName, serverAddress, parseInt(serverPort))
+					onAddClick({
+						name: serverName,
+						url: serverAddress,
+						port: parseInt(serverPort),
+						clientId: serverClientId,
+						id: server.id,
+					})
 				}
 			>
 				{" "}
-				Add Server
+				Save Server
 			</button>
 			<button
 				className={settingsButtonClassname + " mt-5"}
