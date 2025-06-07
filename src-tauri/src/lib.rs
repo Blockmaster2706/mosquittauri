@@ -1,6 +1,11 @@
 #![warn(clippy::all)]
 #![allow(unexpected_cfgs)]
 
+use std::{
+    sync::mpsc::{channel, Sender},
+    thread::spawn,
+};
+
 use anyhow::{Context, Result};
 use chrono::Local;
 
@@ -8,10 +13,7 @@ use ipc::{
     command,
     event::{LogEvent, MsqtEvent},
 };
-use tauri::{
-    async_runtime::{block_on, channel, spawn, Sender},
-    AppHandle,
-};
+use tauri::AppHandle;
 use tauri_plugin_log::{
     fern::{log_file, Dispatch, Output},
     Target, TargetKind,
@@ -24,8 +26,6 @@ mod mqtt;
 #[cfg(test)]
 mod test;
 mod utils;
-
-const LOG_EVENT_QUEUE_LEN: usize = 32;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<()> {
@@ -69,7 +69,8 @@ pub fn run() -> Result<()> {
                             .chain(Output::call(move |record| {
                                 eprintln!("event dispatch");
                                 let event = LogEvent::from_record(record);
-                                block_on(sender.send(event))
+                                sender
+                                    .send(event)
                                     .expect("Failed to send log event to channel");
                             })),
                     )))
@@ -83,11 +84,17 @@ pub fn run() -> Result<()> {
 }
 
 fn start_log_event_listener(app: AppHandle) -> Sender<LogEvent> {
-    let (log_sender, mut log_receiver) = channel::<LogEvent>(LOG_EVENT_QUEUE_LEN);
-    spawn(async move {
-        while let Some(event) = log_receiver.recv().await {
-            if let Err(_e) = event.send(&app) {
-                continue;
+    let (log_sender, log_receiver) = channel::<LogEvent>();
+    spawn(move || loop {
+        match log_receiver.recv() {
+            Ok(event) => {
+                if let Err(e) = event.send(&app) {
+                    log::warn!("Failed to send log event: {e}");
+                    continue;
+                }
+            }
+            Err(e) => {
+                log::warn!("Failed to receive log event: {e}")
             }
         }
     });
