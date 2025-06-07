@@ -77,17 +77,31 @@ export default function TopicList({
 				<ol className="w-full h-full overflow-y-scroll scrollbar-theme break-words">
 					{topicList.map((topic) => {
 						return (
-							<li key={topic.id} className="w-full mt-2">
+							<li
+								key={topic.id}
+								className={
+									"mt-2 grid grid-cols-10 w-[calc(100%-10px)] border-1 border-gray100 " +
+									(topic.enabled
+										? "bg-accent hover:bg-accentHover text-gray100"
+										: "bg-gray60 hover:bg-gray80")
+								}
+							>
 								<button
+									className="col-start-1 col-span-9"
 									onClick={() => handleClick(topic)}
-									className={
-										"w-[calc(100%-10px)] border-1 border-gray100 " +
-										(topic.enabled
-											? "bg-accent hover:bg-accentHover text-gray100"
-											: "bg-gray60 hover:bg-gray80")
-									}
 								>
 									{topic?.name}
+								</button>
+								<button
+									className="col-start-10 col-span-1"
+									title="DELETE"
+									onClick={() =>
+										invoke(commands.delete_topic, {
+											id: topic.id,
+										})
+									}
+								>
+									X
 								</button>
 							</li>
 						);
