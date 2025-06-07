@@ -1,59 +1,66 @@
 use std::{
     sync::{
         atomic::{AtomicBool, Ordering},
+        mpsc::{channel, Receiver, RecvTimeoutError, Sender},
         Arc,
     },
-    thread::sleep,
-    time::Duration,
+    thread::{spawn, JoinHandle},
+    time::{Duration, Instant},
 };
 
 use anyhow::Result;
-use rumqttc::{Client, MqttOptions, Publish, QoS};
-use tauri::async_runtime::{block_on, channel, spawn, JoinHandle, Receiver, Sender};
-
-use crate::{ipc::event::MqttSendEvent, model::Message};
+use rumqttc::{AsyncClient, MqttOptions, Publish, QoS};
+use tauri::async_runtime as tk;
 
 use super::MqttConnection;
+use crate::{ipc::event::MqttSendEvent, model::Message};
 
-#[allow(dead_code)]
 pub struct MqttPool {
     options: MqttOptions,
     connections: Vec<MqttConnection>,
     topics: Vec<String>,
     running: Arc<AtomicBool>,
     msg_listener_handle: JoinHandle<()>,
+    msg_sender_handle: JoinHandle<()>,
     publish_sender: Sender<Publish>,
     capacity: usize,
 }
 
-#[allow(dead_code)]
 impl MqttPool {
+    pub const MQTT_CLIENT_CAP: usize = 16;
     pub const SEND_QUEUE_LEN: usize = 16;
     pub const PACKET_QUEUE_LEN: usize = 96;
     pub const MSG_BATCH_QUEUE_LEN: usize = 16;
 
-    pub fn new(options: MqttOptions, message_sender: Sender<Vec<Message>>) -> Self {
+    #[must_use]
+    pub fn new(options: MqttOptions) -> (Self, Sender<MqttSendEvent>, Receiver<Vec<Message>>) {
         let running = Arc::new(AtomicBool::new(true));
+        let (msg_listener_sender, msg_listener_receiver) = channel();
+        let (msg_sender_sender, msg_sender_receiver) = channel();
         let (msg_listener_handle, publish_sender) =
-            Self::start_msg_listener(running.clone(), message_sender);
-        Self {
-            options,
-            connections: Vec::new(),
-            msg_listener_handle,
-            publish_sender,
-            running,
-            topics: Vec::new(),
-            capacity: 10,
-        }
+            Self::start_msg_listener(running.clone(), msg_listener_sender);
+        let msg_sender_handle =
+            Self::start_msg_sender(options.clone(), running.clone(), msg_sender_receiver);
+        (
+            Self {
+                options,
+                connections: Vec::new(),
+                msg_listener_handle,
+                msg_sender_handle,
+                publish_sender,
+                running,
+                topics: Vec::new(),
+                capacity: 10,
+            },
+            msg_sender_sender,
+            msg_listener_receiver,
+        )
     }
     pub fn add_subscriber(&mut self, topic: impl Into<String>) -> Result<()> {
-        let (client, connection) = Client::new(self.options.clone(), 10);
-        client.subscribe(topic, QoS::ExactlyOnce)?;
-        let mqtt_connection = MqttConnection::new(
-            connection,
-            self.publish_sender.clone(),
-            self.running.clone(),
-        );
+        let (client, eventloop) = AsyncClient::new(self.options.clone(), Self::MQTT_CLIENT_CAP);
+        tk::block_on(client.subscribe(topic, QoS::ExactlyOnce))?;
+        let mqtt_connection =
+            MqttConnection::new(eventloop, self.publish_sender.clone(), self.running.clone());
         self.connections.push(mqtt_connection);
         Ok(())
     }
@@ -62,35 +69,39 @@ impl MqttPool {
     }
     pub fn disconnect(self) {
         self.running.store(false, Ordering::Relaxed);
-        let connections = self.connections.into_iter().map(|c| c.await_disconnect());
-        block_on(async move {
-            for conn in connections {
-                conn.await;
-            }
-        });
-        while self.msg_listener_handle.inner().is_finished() {}
+        for conn in self.connections {
+            conn.await_disconnect();
+        }
+        if let Err(e) = self.msg_listener_handle.join() {
+            log::warn!("Failed to stop message listner: {e:?}")
+        };
     }
 
-    fn start_send_queue(
-        &mut self,
+    fn start_msg_sender(
+        options: MqttOptions,
         running: Arc<AtomicBool>,
-        mut receiver: Receiver<MqttSendEvent>,
+        receiver: Receiver<MqttSendEvent>,
     ) -> JoinHandle<()> {
-        let (client, _connection) = Client::new(self.options.clone(), 10);
-        spawn(async move {
+        let (client, _eventloop) = AsyncClient::new(options, Self::MQTT_CLIENT_CAP);
+        spawn(move || {
             while running.load(Ordering::Relaxed) {
-                let mut messages = Vec::new();
-                receiver
-                    .recv_many(&mut messages, Self::SEND_QUEUE_LEN)
-                    .await;
-                for msg in messages {
-                    if let Err(e) =
-                        client.publish(msg.topic(), QoS::ExactlyOnce, true, msg.payload())
-                    {
-                        log::error!("Failed to send message: {e}")
+                match receiver.recv_timeout(Duration::from_millis(1000)) {
+                    Ok(msg) => {
+                        if let Err(e) =
+                            client.try_publish(msg.topic(), QoS::ExactlyOnce, true, msg.payload())
+                        {
+                            log::warn!("Failed to publish mqtt message: {e}")
+                        }
+                    }
+
+                    Err(RecvTimeoutError::Timeout) => continue,
+
+                    Err(RecvTimeoutError::Disconnected) => {
+                        return;
                     }
                 }
             }
+            log::info!("Stopped message sender")
         })
     }
 
@@ -98,31 +109,29 @@ impl MqttPool {
         running: Arc<AtomicBool>,
         message_sender: Sender<Vec<Message>>,
     ) -> (JoinHandle<()>, Sender<Publish>) {
-        let (sender, mut receiver) = channel(96);
-        let handle = spawn(async move {
+        let (sender, receiver) = channel::<Publish>();
+        let handle = spawn(move || {
+            let start = Instant::now();
+            let mut messages = Vec::new();
             while running.load(Ordering::Relaxed) {
-                let mut packets = Vec::new();
-                receiver
-                    .recv_many(&mut packets, Self::PACKET_QUEUE_LEN)
-                    .await;
-                #[allow(unused_variables)]
-                let messages: Vec<Message> = packets
-                    .into_iter()
-                    .filter_map(|publish: Publish| -> Option<Message> {
-                        match publish.try_into() {
-                            Ok(msg) => Some(msg),
-                            Err(e) => {
-                                log::warn!("Failed to parse message: {e}");
-                                None
-                            }
+                while start.elapsed().gt(&Duration::from_millis(1500)) {
+                    let Ok(publish) = receiver.recv_timeout(Duration::from_millis(1000)) else {
+                        continue;
+                    };
+                    let msg = match publish.try_into() {
+                        Ok(msg) => msg,
+                        Err(e) => {
+                            log::warn!("Failed to parse message: {e}");
+                            continue;
                         }
-                    })
-                    .collect();
-                if let Err(e) = message_sender.send(messages).await {
-                    log::warn!("Failed to send message: {e}");
+                    };
+                    messages.push(msg);
                 }
-                sleep(Duration::from_secs(2));
             }
+            if let Err(e) = message_sender.send(messages) {
+                log::warn!("Failed to send message to send channel: {e}");
+            }
+            log::info!("Stopped package listener")
         });
         (handle, sender)
     }
