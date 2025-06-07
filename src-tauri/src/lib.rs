@@ -4,9 +4,16 @@
 use anyhow::{Context, Result};
 use chrono::Local;
 
-use ipc::command;
+use ipc::{
+    command,
+    event::{LogEvent, MsqtEvent},
+};
+use tauri::{
+    async_runtime::{block_on, channel, spawn, Sender},
+    AppHandle,
+};
 use tauri_plugin_log::{
-    fern::{log_file, Dispatch},
+    fern::{log_file, Dispatch, Output},
     Target, TargetKind,
 };
 
@@ -17,6 +24,8 @@ mod mqtt;
 #[cfg(test)]
 mod test;
 mod utils;
+
+const LOG_EVENT_QUEUE_LEN: usize = 32;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<()> {
@@ -35,34 +44,52 @@ pub fn run() -> Result<()> {
             command::set_topic_enabled,
             command::listen_all_topics,
             command::set_listen_all_topics,
+            command::mqtt_connect,
         ])
         .setup(|app| {
-            if cfg!(debug_assertions) {
-                let handle = app.handle();
-                handle.plugin(command::mqtt_plugin())?;
-                handle.plugin(
-                    tauri_plugin_log::Builder::default()
-                        .target(Target::new(TargetKind::Dispatch(
-                            Dispatch::new().chain(log_file("msqt.log")?),
-                        )))
-                        .level(log::LevelFilter::Info)
-                        .format(|out, msg, record| {
-                            let now = Local::now();
-                            out.finish(format_args!(
-                                "{}|{}|{}|{}|{}",
-                                now.format("%Y.%m.%d"),
-                                now.format("%H:%M:%S"),
-                                record.module_path().unwrap_or("???"),
-                                record.level(),
-                                msg
-                            ))
-                        })
-                        .build(),
-                )?;
-            }
+            let sender = start_log_event_listener(app.handle().clone());
+            let handle = app.handle();
+            handle.plugin(
+                tauri_plugin_log::Builder::default()
+                    .level(log::LevelFilter::Info)
+                    .format(|out, msg, record| {
+                        let now = Local::now();
+                        out.finish(format_args!(
+                            "{}|{}|{}|{}|{}",
+                            now.format("%Y.%m.%d"),
+                            now.format("%H:%M:%S"),
+                            record.module_path().unwrap_or("???"),
+                            record.level(),
+                            msg
+                        ))
+                    })
+                    .target(Target::new(TargetKind::Dispatch(
+                        Dispatch::new()
+                            .chain(log_file("msqt.log")?)
+                            .chain(Output::call(move |record| {
+                                eprintln!("event dispatch");
+                                let event = LogEvent::from_record(record);
+                                block_on(sender.send(event))
+                                    .expect("Failed to send log event to channel");
+                            })),
+                    )))
+                    .build(),
+            )?;
             Ok(())
         })
         .run(tauri::generate_context!())
         .context("error while running tauri application")?;
     Ok(())
+}
+
+fn start_log_event_listener(app: AppHandle) -> Sender<LogEvent> {
+    let (log_sender, mut log_receiver) = channel::<LogEvent>(LOG_EVENT_QUEUE_LEN);
+    spawn(async move {
+        while let Some(event) = log_receiver.recv().await {
+            if let Err(_e) = event.send(&app) {
+                continue;
+            }
+        }
+    });
+    log_sender
 }

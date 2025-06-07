@@ -1,4 +1,7 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use tauri::{AppHandle, Emitter};
+
+use crate::model::Message;
 
 #[allow(dead_code)]
 #[derive(Clone, Serialize)]
@@ -8,7 +11,7 @@ impl MqttDisconnectEvent {
     pub const ID: &str = "mqtt-disconnect";
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MqttSendEvent {
     topic: String,
@@ -17,7 +20,16 @@ pub struct MqttSendEvent {
 
 #[allow(dead_code)]
 impl MqttSendEvent {
-    const ID: &str = "mqtt-send";
+    pub const ID: &str = "mqtt-send";
+    pub fn new(topic: impl Into<String>, payload: impl Into<String>) -> Self {
+        Self {
+            topic: topic.into(),
+            payload: payload.into(),
+        }
+    }
+    pub fn send(&self, app: &AppHandle) -> tauri::Result<()> {
+        app.emit(Self::ID, self)
+    }
     pub fn topic(&self) -> &str {
         &self.topic
     }
@@ -28,11 +40,16 @@ impl MqttSendEvent {
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MqttPullEvent {
-    topic: String,
-    payload: String,
+pub struct MqttSyncEvent {
+    messages: Vec<Message>,
 }
-impl MqttPullEvent {
+impl MqttSyncEvent {
     #[allow(dead_code)]
-    const ID: &str = "mqtt-pull";
+    pub const ID: &str = "mqtt-pull";
+    pub fn new(messages: Vec<Message>) -> Self {
+        Self { messages }
+    }
+    pub fn send(&self, app: &AppHandle) -> tauri::Result<()> {
+        app.emit(Self::ID, self)
+    }
 }

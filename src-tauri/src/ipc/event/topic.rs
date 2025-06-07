@@ -1,29 +1,32 @@
-use serde::Serialize;
-use tauri::{AppHandle, Emitter};
+use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 
 use crate::model::Topic;
 
+use super::MsqtEvent;
+
 // include!("../../../gen/proto/event.topic.v1.rs");
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopicUpdate {
     list: Option<Vec<Topic>>,
 }
-impl TopicUpdate {
+
+impl MsqtEvent for TopicUpdate {
     const ID: &str = "topic-update";
-    pub fn send(app: &AppHandle) -> tauri::Result<()> {
-        let topics = match Topic::find_by_selected_server() {
-            Ok(topics) => topics,
+}
+impl TopicUpdate {
+    pub fn from_all(app: &AppHandle) -> tauri::Result<Self> {
+        let list = match Topic::find_by_selected_server() {
+            Ok(list) => list,
             Err(e) => {
                 log::error!("Failed to get all topics {e}");
-                TopicError::send(app, &e);
+                let _ = TopicError::new(&e).send(app);
                 return Err(e.into());
             }
         };
-        app.emit(Self::ID, TopicUpdate { list: topics })
-            .inspect_err(|e| log::error!("Failed to send Topic Update event {e}"))?;
-        Ok(())
+        Ok(Self { list })
     }
 }
 
@@ -41,21 +44,20 @@ impl TopicUpdate {
 //     }
 // }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopicError {
     msg: String,
 }
-impl TopicError {
+
+impl MsqtEvent for TopicError {
     const ID: &str = "topic-error";
-    pub fn send(app: &AppHandle, msg: &impl ToString) {
-        if let Err(e) = app.emit(
-            Self::ID,
-            TopicError {
-                msg: msg.to_string(),
-            },
-        ) {
-            log::error!("Failed to send Topic Error Event: {e:?}");
+}
+
+impl TopicError {
+    pub fn new(msg: &impl ToString) -> Self {
+        Self {
+            msg: msg.to_string(),
         }
     }
 }
