@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { useEffect, useState } from "react";
 
 export type message = {
 	timestamp: string;
 	message: string;
 	topic: string;
+	logLevel: "info" | "warning" | "error" | "debug";
 };
 
 export interface MessageViewProps {
@@ -11,7 +13,7 @@ export interface MessageViewProps {
 }
 
 export default function LogsMessageView() {
-	const messageArray = [
+	const [messageArray, setMessageArray] = useState<message[]>([
 		{
 			timestamp: "8am",
 			message: "Dies ist ein Logs Test",
@@ -91,9 +93,17 @@ export default function LogsMessageView() {
 			topic: "LoremIpsum",
 			logLevel: "info",
 		},
-	];
+	]);
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		const unlisten = listen("log", (event) => {
+			setMessageArray((prevMessages: message[]) => {
+				const newMessage = event.payload as message;
+				return [...prevMessages, newMessage];
+			});
+			console.log("Received log event:", event);
+		});
+	}, []);
 
 	return (
 		<div className="w-full h-full mt-5">
