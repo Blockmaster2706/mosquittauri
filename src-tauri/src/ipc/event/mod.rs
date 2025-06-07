@@ -16,6 +16,6 @@ pub trait MsqtEvent: Clone + Serialize + DeserializeOwned {
     const ID: &str;
     fn send(&self, app: &AppHandle) -> tauri::Result<()> {
         app.emit(Self::ID, self)
-            .inspect_err(|e| ::log::warn!("Failed to send {:?} event {e}", type_name::<Self>()))
+            .inspect_err(|e| ::log::warn!("Failed to send {:?}: {e}", type_name::<Self>()))
     }
 }
