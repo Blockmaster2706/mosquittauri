@@ -1,41 +1,57 @@
-use std::sync::atomic::Ordering;
+use std::{sync::atomic::Ordering, time::Duration};
 
-use tauri::{
-    async_runtime::channel,
-    plugin::{Builder as PluginBuilder, TauriPlugin},
-    AppHandle, Listener, Runtime,
-};
+use anyhow::Context;
+use tauri::{AppHandle, Listener};
 
 use crate::{
-    ipc::event::MqttDisconnectEvent,
-    model::{MsqtDao, Server, Session},
+    ipc::event::{MqttDisconnectEvent, MqttSendEvent, MqttSyncEvent},
+    model::{MsqtDao, Server, Session, Topic},
     mqtt::MqttPool,
 };
 
 #[tauri::command]
-async fn connect<R: Runtime>(app: AppHandle<R>) {
-    let server_id = Session::get_or_init().unwrap().server_id().unwrap();
+pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
+    let server_id = Session::get_or_init()
+        .context("Failed to get session")?
+        .server_id()
+        .unwrap();
     let server = Server::find_by_id(server_id).unwrap();
-    let (message_sender, mut message_receiver) = channel(32);
-    let pool = MqttPool::new(server.get_mqtt_options(), message_sender);
+    let (mut pool, msg_sender, msg_recever) = MqttPool::new(server.get_mqtt_options());
     let running = pool.get_running_atomic();
-    let running_disconnect = pool.get_running_atomic();
+    let running_disconnect = running.clone();
     app.listen(MqttDisconnectEvent::ID, move |_event| {
         running_disconnect.store(false, Ordering::Relaxed);
     });
-    // let message_reveiver_handle = spawn(async move {
+    app.listen(MqttSendEvent::ID, move |event| {
+        let send_event = match serde_json::from_str::<MqttSendEvent>(event.payload()) {
+            Ok(event) => event,
+            Err(e) => {
+                log::warn!("Failed to parse send event: {e}");
+                return;
+            }
+        };
+        let msg_sender = &msg_sender;
+        if let Err(e) = msg_sender.send(send_event) {
+            log::error!("Failed to send message: {e}")
+        }
+    });
+
+    // Subscribe to all topics for selected server
+    for topic in Topic::find_by_selected_server()?.context("No server selected")? {
+        if let Err(e) = pool.add_subscriber(topic.name()) {
+            log::error!("Failed to subscribe to topic {e}")
+        }
+    }
+
     while running.load(Ordering::Relaxed) {
-        let mut messages = Vec::new();
-        message_receiver
-            .recv_many(&mut messages, MqttPool::MSG_BATCH_QUEUE_LEN)
-            .await;
+        let Ok(batch) = msg_recever.recv_timeout(Duration::from_millis(1000)) else {
+            continue;
+        };
+        if let Err(e) = MqttSyncEvent::new(batch).send(&app) {
+            log::error!("Failed to send mqtt sync event: {e}");
+            continue;
+        }
     }
     pool.disconnect();
-    // });
-}
-
-pub fn mqtt_plugin<R: Runtime>() -> TauriPlugin<R> {
-    PluginBuilder::new("msqt_mqtt")
-        .invoke_handler(tauri::generate_handler![connect])
-        .build()
+    Ok(())
 }
