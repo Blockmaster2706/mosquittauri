@@ -5,7 +5,6 @@ use crate::model::{Session, Topic};
 
 #[tauri::command]
 pub async fn add_topic(server_id: u64, name: String, app: AppHandle) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Topic::try_new(server_id, name) {
         log::error!("Failed to create topic: {e}");
         TopicError::new(&e).send(&app)?;
@@ -25,14 +24,12 @@ pub async fn set_topic_enabled(id: u64, enabled: bool, app: AppHandle) -> tauri:
 
 #[tauri::command]
 pub async fn edit_topic(id: u64, name: String, app: AppHandle) -> tauri::Result<()> {
-    // on_event.send()
     Topic::update(id, name).inspect_err(|e| log::error!("Failed to create topic: {e}"))?;
     TopicUpdate::from_all(&app)?.send(&app)
 }
 
 #[tauri::command]
 pub async fn delete_topic(id: u64, app: AppHandle) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Topic::delete(id) {
         log::error!("Failed to create topic: {e}");
         TopicError::new(&e).send(&app)?;
@@ -55,5 +52,6 @@ pub async fn set_listen_all_topics(app: AppHandle, enabled: bool) -> tauri::Resu
     if let Err(e) = Session::set_listen_all_topics(enabled) {
         TopicError::new(&e).send(&app)?;
     }
+    TopicUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
