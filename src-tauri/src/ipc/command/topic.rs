@@ -34,6 +34,7 @@ pub async fn delete_topic(id: u64, app: AppHandle) -> tauri::Result<()> {
         log::error!("Failed to create topic: {e}");
         TopicError::new(&e).send(&app)?;
     }
+    TopicUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
 
@@ -52,6 +53,5 @@ pub async fn set_listen_all_topics(app: AppHandle, enabled: bool) -> tauri::Resu
     if let Err(e) = Session::set_listen_all_topics(enabled) {
         TopicError::new(&e).send(&app)?;
     }
-    TopicUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
