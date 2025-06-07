@@ -55,7 +55,7 @@ pub fn run() -> Result<()> {
                     .format(|out, msg, record| {
                         let now = Local::now();
                         out.finish(format_args!(
-                            "{}|{}|{}|{}|{}",
+                            "{}|{}|{}|{} ::: {}",
                             now.format("%Y.%m.%d"),
                             now.format("%H:%M:%S"),
                             record.module_path().unwrap_or("???"),
@@ -67,8 +67,13 @@ pub fn run() -> Result<()> {
                         Dispatch::new()
                             .chain(log_file("msqt.log")?)
                             .chain(Output::call(move |record| {
-                                eprintln!("event dispatch");
-                                let event = LogEvent::from_record(record);
+                                let event = match LogEvent::try_from_record(record) {
+                                    Ok(event) => event,
+                                    Err(e) => {
+                                        eprintln!("Failed to generate LogEvent from record: {e}");
+                                        return;
+                                    }
+                                };
                                 sender
                                     .send(event)
                                     .expect("Failed to send log event to channel");
@@ -89,12 +94,12 @@ fn start_log_event_listener(app: AppHandle) -> Sender<LogEvent> {
         match log_receiver.recv() {
             Ok(event) => {
                 if let Err(e) = event.send(&app) {
-                    log::warn!("Failed to send log event: {e}");
+                    eprintln!("Failed to send log event: {e}");
                     continue;
                 }
             }
             Err(e) => {
-                log::warn!("Failed to receive log event: {e}")
+                eprintln!("Failed to receive log event: {e}")
             }
         }
     });
