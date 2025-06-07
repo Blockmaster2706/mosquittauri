@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { settingsButtonClassname } from "./settings-pane";
 import { Server } from "../types/server";
+import { invoke } from "@tauri-apps/api/core";
 
 interface EditServerProps {
 	input_classname: string;
@@ -85,6 +86,20 @@ export default function EditServer({
 			>
 				{" "}
 				Save Server
+			</button>
+			<button
+				className={
+					"w-[calc(100%-10px)] cursor-pointer disabled:bg-gray60 disabled:text-gray30 disabled:border-gray100 disabled:cursor-not-allowed h-7 bg-red-500 text-gray100 border-2 enabled:hover:bg-gray80 border-accent enabled:hover:border-accent enabled:hover:text-accent duration-100 mt-5"
+				}
+				onClick={() =>
+					invoke("delete_server", {
+						id: server.id,
+					}).then(() => {
+						onBackClick();
+					})
+				}
+			>
+				Delete Server
 			</button>
 			<button
 				className={settingsButtonClassname + " mt-5"}
