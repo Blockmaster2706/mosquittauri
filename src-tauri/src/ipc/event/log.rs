@@ -1,6 +1,8 @@
+use anyhow::{Context, Result};
 use chrono::Local;
 use log::Record;
 use serde::{Deserialize, Serialize};
+use tauri::Emitter;
 
 use super::MsqtEvent;
 
@@ -16,17 +18,24 @@ pub struct LogEvent {
 
 impl MsqtEvent for LogEvent {
     const ID: &str = "log";
+    fn send(&self, app: &tauri::AppHandle) -> tauri::Result<()> {
+        app.emit(Self::ID, self)
+            .inspect_err(|e| eprintln!("Failed to send LogEvent: {e}"))
+    }
 }
 
 impl LogEvent {
-    pub fn from_record(record: &Record) -> Self {
-        let msg = record.args().as_str().expect("Failed to get log message");
-        Self {
+    pub fn try_from_record(record: &Record) -> Result<Self> {
+        let msg = record
+            .args()
+            .as_str()
+            .context("Failed to get log message")?;
+        Ok(Self {
             level: record.level().to_string(),
             module: record.module_path().map(ToString::to_string),
             target: record.target().to_string(),
             timestamp: Local::now().timestamp(),
             message: msg.to_string(),
-        }
+        })
     }
 }
