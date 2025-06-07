@@ -2,6 +2,7 @@
 #![allow(unexpected_cfgs)]
 
 use std::{
+    fs,
     sync::mpsc::{channel, Sender},
     thread::spawn,
 };
@@ -35,6 +36,8 @@ const LOG_LEVEL: LevelFilter = LevelFilter::Info;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<()> {
+    log_rotation(); // Rotate logs to keep only the last 3 log files
+
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1"); // Disable dmabuf renderer for WebKitGTK so that the program starts correctly on all Linux Distros including Fedora
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -71,7 +74,10 @@ pub fn run() -> Result<()> {
                     })
                     .target(Target::new(TargetKind::Dispatch(
                         Dispatch::new()
-                            .chain(log_file("msqt.log")?)
+                            .chain(log_file(format!(
+                                "msqt_log_{}.log",
+                                chrono::Local::now().format("%d_%m_%Y_%H%M")
+                            ))?)
                             .chain(Output::call(move |record| {
                                 let event = match LogEvent::try_from_record(record) {
                                     Ok(event) => event,
@@ -110,4 +116,23 @@ fn start_log_event_listener(app: AppHandle) -> Sender<LogEvent> {
         }
     });
     log_sender
+}
+
+fn log_rotation() {
+    let mut log_files: Vec<_> = fs::read_dir(std::env::current_dir().unwrap())
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| {
+            entry.path().is_file() && entry.file_name().to_string_lossy().contains("msqt_log_")
+        })
+        .collect();
+
+    if log_files.len() >= 3 {
+        log_files.sort_by_key(|entry| entry.metadata().and_then(|m| m.modified()).ok());
+
+        if let Some(oldest_file) = log_files.first() {
+            fs::remove_file(oldest_file.path()).unwrap();
+            log::debug!("{}{:?}", "Deleted oldest log file: ", oldest_file.path());
+        }
+    }
 }
