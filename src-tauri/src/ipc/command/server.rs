@@ -11,7 +11,6 @@ pub async fn add_server(
     client_id: String,
     app: AppHandle,
 ) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Server::try_new(name, url, port, client_id) {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
@@ -39,7 +38,6 @@ pub async fn edit_server(
     client_id: String,
     app: AppHandle,
 ) -> tauri::Result<()> {
-    // on_event.send()
     Server::update(id, name, url, port, client_id)
         .inspect_err(|e| log::error!("Failed to create server: {e}"))?;
     ServerUpdate::from_all(&app)?.send(&app)?;
@@ -54,10 +52,10 @@ pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
 
 #[tauri::command]
 pub async fn delete_server(id: u64, app: AppHandle) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Server::delete(id) {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }
+    ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }

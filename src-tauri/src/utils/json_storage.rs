@@ -118,7 +118,7 @@ impl<T: MsqtDto> JsonStorage<T> {
         self.update(|list| {
             let index = list
                 .iter()
-                .position(|obj| obj.id() != id)
+                .position(|obj| obj.id() == id)
                 .context(format!("No {} with the id {id}", name))?;
             list.remove(index);
 
