@@ -2,10 +2,11 @@ import { listen } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 
 export type message = {
+	level: "info" | "warning" | "error" | "debug" | "trace";
+	module?: string;
+	target: string;
 	timestamp: string;
 	message: string;
-	topic: string;
-	logLevel: "info" | "warning" | "error" | "debug";
 };
 
 export interface MessageViewProps {
@@ -13,114 +14,43 @@ export interface MessageViewProps {
 }
 
 export default function LogsMessageView() {
-	const [messageArray, setMessageArray] = useState<message[]>([
-		{
-			timestamp: "8am",
-			message: "Dies ist ein Logs Test",
-			topic: "test",
-			logLevel: "info",
-		},
-		{
-			timestamp: "9:30am",
-			message: "Logs sind Cool",
-			topic: "test",
-			logLevel: "info",
-		},
-		{
-			timestamp: "10:21am",
-			message:
-				"Mein Mitazubi steht richtig hart auf Baumstämme oder wie man das schreibt",
-			topic: "Holzbrötchen",
-			logLevel: "info",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "error",
-		},
-		{
-			timestamp: "11:11am",
-			message: "Dies ist ein *weiterer* Logs Test",
-			topic: "test",
-			logLevel: "warning",
-		},
-		{
-			timestamp: "69am",
-			message: "Lol funny Logs",
-			topic: "hehe",
-			logLevel: "info",
-		},
-		{
-			timestamp: "420am",
-			message: "Wann gratis Logs für alle, Herr Habeck?",
-			topic: "Brokkologs",
-			logLevel: "info",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "error",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "info",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "warning",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "info",
-		},
-		{
-			timestamp: "11am",
-			message:
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			topic: "LoremIpsum",
-			logLevel: "info",
-		},
-	]);
+	const [messageArray, setMessageArray] = useState<message[]>([]);
 
 	useEffect(() => {
 		const unlisten = listen("log", (event) => {
+			console.log("Received log event:", event);
 			setMessageArray((prevMessages: message[]) => {
 				const newMessage = event.payload as message;
 				return [...prevMessages, newMessage];
 			});
 			console.log("Received log event:", event);
 		});
+
+		return () => {
+			unlisten.then((f) => f());
+		};
 	}, []);
 
 	return (
 		<div className="w-full h-full mt-5">
 			<ul>
 				{messageArray.map((message, index) => {
-					const topicColor =
-						message.logLevel === "info"
-							? "text-[var(--accent)]"
-							: message.logLevel === "warning"
-								? "text-yellow-300"
-								: message.logLevel === "error"
-									? "text-red-500"
-									: "text-gray40";
+					const topicColor = (() => {
+						switch (message.level.toLowerCase()) {
+							case "info":
+								return "text-[var(--accent)]";
+							case "warning":
+								return "text-yellow-300";
+							case "error":
+								return "text-red-500";
+							default:
+								return "text-gray-500";
+						}
+					})();
 					return (
 						<li
 							key={index}
-							className="w-full bg-transparent pl-2 mt-3 break-all overflow-x-clip"
+							className="w-full bg-transparent pl-2 mt-3 break-words overflow-x-clip"
 						>
 							<div>
 								<label
@@ -130,10 +60,12 @@ export default function LogsMessageView() {
 									}
 								>
 									<label className="overflow-clip overflow-ellipsis text-nowrap max-w-[calc(70vw-7rem)]">
-										{message.topic}
+										{message.module ? message.module : ""}
 									</label>
 									<label className="ml-5 text-xs mt-auto inline-flex text-gray40 min-w-fit">
-										{message.timestamp}
+										{new Date(
+											parseInt(message.timestamp) * 1000,
+										).toLocaleString()}
 									</label>
 								</label>
 								<div className="rounded-b-2xl rounded-tr-2xl p-1 bg-gray80 m-0">
