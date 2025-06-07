@@ -13,6 +13,7 @@ use ipc::{
     command,
     event::{LogEvent, MsqtEvent},
 };
+use log::LevelFilter;
 use tauri::AppHandle;
 use tauri_plugin_log::{
     fern::{log_file, Dispatch, Output},
@@ -26,6 +27,11 @@ mod mqtt;
 #[cfg(test)]
 mod test;
 mod utils;
+
+#[cfg(debug_assertions)]
+const LOG_LEVEL: LevelFilter = LevelFilter::Trace;
+#[cfg(not(debug_assertions))]
+const LOG_LEVEL: LevelFilter = LevelFilter::Info;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<()> {
@@ -51,7 +57,7 @@ pub fn run() -> Result<()> {
             let handle = app.handle();
             handle.plugin(
                 tauri_plugin_log::Builder::default()
-                    .level(log::LevelFilter::Info)
+                    .level(LOG_LEVEL)
                     .format(|out, msg, record| {
                         let now = Local::now();
                         out.finish(format_args!(
