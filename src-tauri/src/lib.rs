@@ -42,7 +42,7 @@ pub fn run() -> Result<()> {
             command::edit_topic,
             command::delete_topic,
             command::set_topic_enabled,
-            command::listen_all_topics,
+            command::is_listen_all_topics,
             command::set_listen_all_topics,
             command::mqtt_connect,
         ])
