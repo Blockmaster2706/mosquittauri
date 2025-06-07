@@ -55,7 +55,7 @@ pub fn run() -> Result<()> {
                     .format(|out, msg, record| {
                         let now = Local::now();
                         out.finish(format_args!(
-                            "{}|{}|{}|{}|{}",
+                            "{}|{}|{}|{} ::: {}",
                             now.format("%Y.%m.%d"),
                             now.format("%H:%M:%S"),
                             record.module_path().unwrap_or("???"),
@@ -67,11 +67,10 @@ pub fn run() -> Result<()> {
                         Dispatch::new()
                             .chain(log_file("msqt.log")?)
                             .chain(Output::call(move |record| {
-                                eprintln!("event dispatch");
                                 let event = match LogEvent::try_from_record(record) {
                                     Ok(event) => event,
-                                    Err(_err) => {
-                                        eprintln!("Failed to generate LogEvent from record");
+                                    Err(e) => {
+                                        eprintln!("Failed to generate LogEvent from record: {e}");
                                         return;
                                     }
                                 };

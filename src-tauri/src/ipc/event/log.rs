@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use chrono::Local;
-use log::Record;
+use log::{Metadata, Record};
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
@@ -26,16 +26,16 @@ impl MsqtEvent for LogEvent {
 
 impl LogEvent {
     pub fn try_from_record(record: &Record) -> Result<Self> {
-        let msg = record
-            .args()
-            .as_str()
-            .context("Failed to get log message")?;
+        let message = format!("{}", record.args())
+            .split_once(" ::: ")
+            .map(|args| (args.1.to_string()))
+            .context("message somehow got past fomat")?;
         Ok(Self {
             level: record.level().to_string(),
             module: record.module_path().map(ToString::to_string),
             target: record.target().to_string(),
             timestamp: Local::now().timestamp(),
-            message: msg.to_string(),
+            message: message.to_string(),
         })
     }
 }
