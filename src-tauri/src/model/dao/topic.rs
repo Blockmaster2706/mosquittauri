@@ -78,6 +78,17 @@ impl Topic {
         Self::find_enabled_by_server(selected_server_id).map(Some)
     }
 
+    pub fn delete_by_server(server_id: u64) -> Result<()> {
+        // STORAGE.get_mut()?.update(|topics| {
+        //     *topics = topics
+        //         .iter_mut()
+        //         .filter(|topic| topic.server_id() != server_id)
+        //         .collect();
+        //     Ok(())
+        // })?;
+        todo!()
+    }
+
     pub fn delete(id: u64) -> Result<()> {
         log::info!("deleting topic with id {id}");
         STORAGE.get_mut()?.delete(id)
