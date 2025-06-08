@@ -88,12 +88,14 @@ We use a Github Actions Pipeline to automatically build the Application for mult
 
 ### 10.2 Technical Debts
 
-| Title                    | Description                                                                                                                                                                                     |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No User-Defined ClientID | In Development, we forgot to add a way for the User to set the Client ID that is going to be sent to the Broker (Kind of like a username). We wanted to add this later on, but ran out of time. |
+| Title                    | Description                                                                                                                                                                                                                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No User-Defined ClientID | In Development, we forgot to add a way for the User to set the Client ID that is going to be sent to the Broker (Kind of like a username). We wanted to add this later on, but ran out of time.                                                                                         |
+| Ignored Warnings         | During Development and Deployment, we have sometimes opted to ignore Warnings. These warnings do not have an impact on the final Application, however they can have an impact on Code Quality. Due to Time Constraints, we have opted not to address these properly for the time being. |
 
 ## 11. Glossary
 
 | Abbreviation | Description                                |
 | ------------ | ------------------------------------------ |
 | MSQT         | The Name of the Application - Mosquittauri |
+| MQTT         | Message Queuing Telemetry Transport        |
