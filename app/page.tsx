@@ -100,6 +100,7 @@ export default function Home() {
 				unlisten();
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -110,6 +111,7 @@ export default function Home() {
 		if (element) {
 			element.scrollIntoView({ behavior: "smooth", block: "end" });
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [MQTTMessageArray]);
 
 	useEffect(() => {
@@ -120,6 +122,7 @@ export default function Home() {
 		if (element) {
 			element.scrollIntoView({ behavior: "smooth", block: "end" });
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [logMessageArray]);
 
 	return (

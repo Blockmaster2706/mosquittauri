@@ -35,7 +35,6 @@ export default function SettingsPage({
 	topicList,
 	setTopicList,
 	connected,
-	setConnected,
 	address,
 }: SettingsPageProps) {
 	const themes = ["mosquittauri", "flashbang", "UwU"];

@@ -1,6 +1,3 @@
-import { listen } from "@tauri-apps/api/event";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-
 export type logMessage = {
 	level: "info" | "warning" | "error" | "debug" | "trace";
 	module?: string;

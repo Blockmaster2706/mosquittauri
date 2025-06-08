@@ -2,7 +2,6 @@
 
 import { emit } from "@tauri-apps/api/event";
 import { Dispatch, SetStateAction } from "react";
-import { message } from "./message-view";
 import { topic } from "./types";
 import PaginatedDropdown from "./paginated-dropdown";
 
@@ -26,7 +25,6 @@ export const handleSubmit = (
 	setInputValue: Dispatch<SetStateAction<string>>,
 ) => {
 	// Process the input value
-	const now = new Date();
 	emit<MQTTPayload>("mqtt-send", {
 		payload: inputValue,
 		topic: topic?.name ?? "",
