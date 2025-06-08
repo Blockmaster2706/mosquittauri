@@ -32,6 +32,7 @@ export default function LogsMessageView({ messageArray }: MessageViewProps) {
 					})();
 					return (
 						<li
+							id={`log-message-${index}`}
 							key={index}
 							className="w-full bg-transparent pl-2 mt-3 break-words overflow-x-clip"
 						>

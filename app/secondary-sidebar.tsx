@@ -1,7 +1,13 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { DocumentIcon, MQTTIcon, SendIcon } from "./icons";
+import {
+	AutoScrollIcon,
+	DocumentIcon,
+	ManualScrollIcon,
+	MQTTIcon,
+	SendIcon,
+} from "./icons";
 import { topic } from "./types";
 import { handleSubmit } from "./publish-bar";
 
@@ -12,6 +18,8 @@ interface PaneSwitcherProps {
 	topic: topic | null;
 	setInputValue: Dispatch<SetStateAction<string>>;
 	sendButtonEnabled: boolean;
+	autoScrollingDisabled: boolean;
+	setAutoScrollDisabled: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function SecondarySidebar({
@@ -21,6 +29,8 @@ export default function SecondarySidebar({
 	topic,
 	setInputValue,
 	sendButtonEnabled,
+	autoScrollingDisabled,
+	setAutoScrollDisabled,
 }: PaneSwitcherProps) {
 	const button_classname =
 		"mt-auto bottom-5 cursor-pointer bg-gray80 w-12 h-12 border-gray80 border-none rounded-full text-[var(--accent)] flex justify-center items-center ";
@@ -29,6 +39,21 @@ export default function SecondarySidebar({
 
 	return (
 		<div className="h-full flex flex-col">
+			<button
+				className={button_classname}
+				onClick={() => setAutoScrollDisabled(!autoScrollingDisabled)}
+				title={
+					autoScrollingDisabled
+						? "Enable Auto Scrolling"
+						: "Disable Auto Scrolling"
+				}
+			>
+				{autoScrollingDisabled ? (
+					<ManualScrollIcon className="size-7" />
+				) : (
+					<AutoScrollIcon className="size-7" />
+				)}
+			</button>
 			{isShowingLogs ? (
 				<button
 					className={button_classname}
