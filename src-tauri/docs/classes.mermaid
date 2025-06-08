@@ -1,0 +1,59 @@
+classDiagram
+    class Server{
+        -u64 id
+        -String name
+        -String url
+        -u16 port
+        -String client_id
+        +id()
+        +find_all()
+        +name()
+        +url()
+        +try_new()
+        +delete()
+        +update()
+        +find_by_id()
+    }
+    class Topic{
+        -u64 id
+        -u64 fk_server_id
+        -String name
+        -enabled bool
+        +id()
+        +find_all()
+        +name()
+        +server_id()
+        +try_new()
+        +update()
+        +delete()
+        +delete_by_server()
+        +find_by_id()
+    }
+    class Message {
+        -u64 id
+        -u64 fk_server_id
+        -String topic
+        -String payload
+        -i64 timestamp
+        +id()
+        +find_all()
+        +topic()
+        +payload()
+        +try_new()
+        +find_by_id()
+    }
+    class Session {
+        -u64 id
+        -u64? fk_selected_server_id
+        -bool connected
+        +id()
+        +connected()
+        +get_or_init()
+        +find_all()
+        +select_server()
+        +find_by_id()
+    }
+
+    Server --> Topic
+    Server --> Session
+    Server --> Message
