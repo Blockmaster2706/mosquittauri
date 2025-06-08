@@ -16,12 +16,13 @@ pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
         .server_id()
         .unwrap();
     let server = Server::find_by_id(server_id).unwrap();
-    let (mut pool, msg_sender, msg_recever) = MqttPool::new(server.get_mqtt_options());
+    let mut pool = MqttPool::new(server.get_mqtt_options());
     let running = pool.get_running_atomic();
     let running_disconnect = running.clone();
     app.listen(MqttDisconnectEvent::ID, move |_event| {
         running_disconnect.store(false, Ordering::Relaxed);
     });
+    let msg_sender = pool.get_msg_sender();
     app.listen(MqttSendEvent::ID, move |event| {
         let send_event = match serde_json::from_str::<MqttSendEvent>(event.payload()) {
             Ok(event) => event,
@@ -30,21 +31,26 @@ pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
                 return;
             }
         };
-        let msg_sender = &msg_sender;
         if let Err(e) = msg_sender.send(send_event) {
             log::error!("Failed to send message: {e}")
         }
     });
 
     // Subscribe to all topics for selected server
-    for topic in Topic::find_by_selected_server()?.context("No server selected")? {
-        if let Err(e) = pool.add_subscriber(topic.name()) {
+    {
+        if let Err(e) = &pool
+            .get_topic_sender()
+            .send(Topic::find_enabled_by_selected_server()?.context("No server selected")?)
+        {
             log::error!("Failed to subscribe to topic {e}")
         }
     }
 
+    let msg_receiver = pool
+        .get_msg_receiver()
+        .context("msg receiver already taken")?;
     while running.load(Ordering::Relaxed) {
-        let Ok(batch) = msg_recever.recv_timeout(Duration::from_millis(1000)) else {
+        let Ok(batch) = msg_receiver.recv_timeout(Duration::from_millis(1000)) else {
             continue;
         };
         if let Err(e) = MqttSyncEvent::new(batch).send(&app) {

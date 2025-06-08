@@ -61,12 +61,21 @@ impl Topic {
             .collect())
     }
 
+    #[allow(dead_code)]
     pub fn find_by_selected_server() -> Result<Option<Vec<Topic>>> {
         log::info!("getting topics for selected server");
         let Some(selected_server_id) = Session::get_or_init()?.server_id() else {
             return Ok(None);
         };
         Self::find_by_server(selected_server_id).map(Some)
+    }
+
+    pub fn find_enabled_by_selected_server() -> Result<Option<Vec<Topic>>> {
+        log::info!("getting topics for selected server");
+        let Some(selected_server_id) = Session::get_or_init()?.server_id() else {
+            return Ok(None);
+        };
+        Self::find_enabled_by_server(selected_server_id).map(Some)
     }
 
     pub fn delete(id: u64) -> Result<()> {

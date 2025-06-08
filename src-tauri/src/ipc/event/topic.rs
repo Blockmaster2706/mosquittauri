@@ -3,7 +3,7 @@ use tauri::AppHandle;
 
 use crate::model::Topic;
 
-use super::MsqtEvent;
+use super::{id, MsqtEvent};
 
 // include!("../../../gen/proto/event.topic.v1.rs");
 
@@ -14,7 +14,7 @@ pub struct TopicUpdate {
 }
 
 impl MsqtEvent for TopicUpdate {
-    const ID: &str = "topic-update";
+    const ID: &str = id::TOPIC_UPDATE;
 }
 impl TopicUpdate {
     pub fn from_all(app: &AppHandle) -> tauri::Result<Self> {
@@ -30,20 +30,6 @@ impl TopicUpdate {
     }
 }
 
-// #[derive(Clone, Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct TopicSelected {
-//     id: u64,
-// }
-// impl TopicSelected {
-//     const ID: &str = "topic-selected";
-//     pub fn send(app: &AppHandle, id: u64) {
-//         if let Err(e) = app.emit(Self::ID, TopicSelected { id }) {
-//             log::error!("Failed to send Topic Error Event: {e:?}");
-//         }
-//     }
-// }
-
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopicError {
@@ -51,7 +37,7 @@ pub struct TopicError {
 }
 
 impl MsqtEvent for TopicError {
-    const ID: &str = "topic-error";
+    const ID: &str = id::TOPIC_ERROR;
 }
 
 impl TopicError {
