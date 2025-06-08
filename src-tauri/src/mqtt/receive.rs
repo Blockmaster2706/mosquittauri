@@ -1,11 +1,11 @@
-use rumqttc::{Event, EventLoop, Packet, Publish};
+use rumqttc::{ConnectionError, Event, EventLoop, Packet, Publish};
 use std::{
     sync::{
         atomic::{AtomicBool, Ordering},
         mpsc::{Receiver, Sender},
         Arc,
     },
-    thread::{spawn, JoinHandle},
+    thread::{sleep, spawn, JoinHandle},
     time::{Duration, Instant},
 };
 use tauri::async_runtime as tk;
@@ -34,9 +34,14 @@ impl MqttPool {
                         }
                     }
                     Ok(event) => log::trace!("ignored packet {event:?} "),
-                    Err(e) => log::warn!("Failed to receive event from server: {e}"),
+                    Err(e) => {
+                        log::error!("Failed to receive event from server: {e}");
+                        running.store(false, Ordering::Relaxed);
+                        break;
+                    }
                 }
 
+                sleep(Duration::from_millis(500));
                 // check if disconnect event sent
                 if instant.elapsed().as_millis() > 1500 {
                     log::trace!("Server listener: Check if running");
