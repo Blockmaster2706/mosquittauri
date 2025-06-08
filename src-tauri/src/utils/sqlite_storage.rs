@@ -1,41 +1,43 @@
 //use anyhow::anyhow;
 use sqlx::{
-    migrate,
-    query,
-    //query_as
+    migrate::{MigrateDatabase, Migrator},
+    sqlite::SqlitePoolOptions,
+    Pool,
+    Sqlite, //query_as
 };
-use std::fs::create_dir_all;
 
 use anyhow::{Context, Result};
 
-use crate::model::MsqtDto;
-
-pub type Db = sqlx::SqlitePool;
+const DB_URL: &str = "sqlite://msqt.sqlite";
 
 //Provision and/or connect to Database
-pub async fn provision_db(app: &tauri::App) -> Result<Db> {
-    let mut db_path = app.path().app_data_dir().context("DB-dir not found")?;
-
-    create_dir_all(&db_path).context("Unable to create dir")?;
-
-    db_path.push("db.sqlite");
-    let db_url = format!("sqlite:{}", db_path.display());
-
-    sqlx::Sqlite::create_database(&db_url)
+pub async fn provision_db() -> Result<()> {
+    if !Sqlite::database_exists(DB_URL)
         .await
-        .context("Unable to create DB")?;
+        .context("Failed to check if db exists")?
+    {
+        sqlx::Sqlite::create_database(DB_URL)
+            .await
+            .context("Failed to create DB")?;
+    }
 
-    let pool = Sqlite::SqlitePoolOptions::new()
-        .connect(&db_url)
+    let crate_dir =
+        std::env::var("CARGO_MANIFEST_DIR").context("Failed to get cargo manifest dir")?;
+    let migrations = std::path::Path::new(&crate_dir).join("./migrations");
+
+    let pool = connect_db().await?;
+    let migrator = Migrator::new(migrations)
         .await
-        .context("Unable to connect with DB")?;
+        .context("Failed to create migrator ")?;
+    migrator.run(&pool).await?;
+    Ok(())
+}
 
-    migrate!("./migrations")
-        .run(&pool)
+pub async fn connect_db() -> Result<Pool<Sqlite>> {
+    SqlitePoolOptions::new()
+        .connect(DB_URL)
         .await
-        .context("DB-migration failed")?;
-
-    Ok(pool)
+        .context("Failed to connect with DB")
 }
 
 // Methods for Datatypes
