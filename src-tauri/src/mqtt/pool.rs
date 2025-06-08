@@ -59,7 +59,6 @@ impl MqttPool {
             client.clone(),
             running.clone(),
             msg_sender_receiver,
-            msg_batch_sender,
         );
         let server_listener_handle =
             Self::start_server_listener(publish_sender, event_loop, running.clone());
