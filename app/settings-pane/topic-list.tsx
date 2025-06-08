@@ -57,6 +57,7 @@ export default function TopicList({
 
 	return (
 		<div
+			className="h-full w-full"
 			onMouseUpCapture={(event) => {
 				console.log("Mouse up event:", event.button);
 				if (event.button === 3) {
@@ -64,7 +65,7 @@ export default function TopicList({
 				}
 			}}
 		>
-			<div className="w-full h-full max-h-[48%] mt-1">
+			<div className="w-full h-full max-h-[70%] mt-1">
 				<label>
 					Current Server:{" "}
 					<label className="text-[var(--accent)]">{serverName}</label>
@@ -76,7 +77,7 @@ export default function TopicList({
 				>
 					New Topic
 				</button>
-				<ol className="w-full h-full overflow-y-scroll scrollbar-theme break-words">
+				<ol className="w-full h-full max-h-[50vh] overflow-y-scroll scrollbar-theme break-words mt-2 mb-3">
 					{topicList.map((topic) => {
 						return (
 							<li
@@ -109,6 +110,12 @@ export default function TopicList({
 						);
 					})}
 				</ol>
+				<button
+					className={settingsButtonClassname}
+					onClick={() => onBackClick()}
+				>
+					Back
+				</button>
 			</div>
 		</div>
 	);
