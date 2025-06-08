@@ -142,7 +142,6 @@ export default function SettingsPage({
 		return () => {
 			unlisten.then((f) => f());
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

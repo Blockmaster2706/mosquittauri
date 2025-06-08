@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { topic } from "../types";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { Server } from "http";
 import commands from "../types/commands";
 import { settingsButtonClassname } from "./settings-pane";
 
