@@ -8,6 +8,7 @@ static STORAGE: JsonStorageLock<Server> = JsonStorageLock::new("server");
 
 impl MsqtDao for Server {
     fn find_all() -> Result<Vec<Server>> {
+        log::info!("getting all servers");
         STORAGE
             .get()?
             .find_all()
@@ -22,10 +23,13 @@ impl Server {
         port: u16,
         client_id: impl Into<String>,
     ) -> Result<Self> {
+        let name = name.into();
+        let url = url.into();
+        log::info!("adding server {name}");
         let server = Self {
-            name: name.into(),
+            name,
             id: STORAGE.get()?.gen_id()?,
-            url: url.into(),
+            url,
             port,
             client_id: client_id.into(),
         };
@@ -37,6 +41,7 @@ impl Server {
     }
 
     pub fn delete(id: u64) -> Result<()> {
+        log::info!("deleting server with id {id}");
         STORAGE.get_mut()?.delete(id)?;
         Ok(())
     }
@@ -48,9 +53,12 @@ impl Server {
         port: u16,
         client_id: impl Into<String>,
     ) -> Result<()> {
+        let name = name.into();
+        let url = url.into();
+        log::info!("updating server {name}");
         STORAGE.get_mut()?.edit(id, |server| {
-            server.name = name.into();
-            server.url = url.into();
+            server.name = name;
+            server.url = url;
             server.port = port;
             server.client_id = client_id.into();
         })
