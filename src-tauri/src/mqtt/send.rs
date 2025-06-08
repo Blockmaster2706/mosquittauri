@@ -1,5 +1,5 @@
 use std::sync::atomic::Ordering;
-use std::sync::mpsc::{RecvTimeoutError, Sender};
+use std::sync::mpsc::RecvTimeoutError;
 use std::sync::Arc;
 use std::sync::{atomic::AtomicBool, mpsc::Receiver};
 use std::thread::{spawn, JoinHandle};
@@ -9,7 +9,6 @@ use rumqttc::{AsyncClient, QoS};
 use tauri::async_runtime as tk;
 
 use crate::ipc::event::MqttSendEvent;
-use crate::model::Message;
 
 use super::{lock::Lock, MqttPool};
 

@@ -2,7 +2,7 @@ use anyhow::{Context, Error, Result};
 use rumqttc::Publish;
 use serde::{Deserialize, Serialize};
 
-use crate::{ipc::event::MqttSendEvent, model::Session};
+use crate::model::Session;
 
 use super::MsqtDto;
 
