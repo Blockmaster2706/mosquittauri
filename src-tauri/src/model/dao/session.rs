@@ -13,7 +13,6 @@ impl MsqtDao for Session {
 }
 
 impl Session {
-    #[allow(dead_code)]
     pub fn get_or_init() -> Result<Self> {
         if let Ok(session) = Self::find_by_id(0) {
             return Ok(session);
@@ -22,7 +21,6 @@ impl Session {
         STORAGE.get_mut()?.insert(session.clone())?;
         Ok(session)
     }
-    #[allow(dead_code)]
     pub fn select_server(server_id: u64) -> Result<()> {
         STORAGE
             .get_mut()?
@@ -32,5 +30,11 @@ impl Session {
             })
             .context("failed to set selected server id")?;
         Ok(())
+    }
+
+    pub fn set_listen_all_topics(enabled: bool) -> Result<()> {
+        STORAGE
+            .get_mut()?
+            .edit(0, |session| session.listen_all_topics = enabled)
     }
 }

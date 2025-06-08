@@ -1,6 +1,6 @@
-mod conn;
+mod lock;
 mod pool;
+mod receive;
+mod send;
 
-pub use conn::MqttConnection;
-#[allow(unused_imports)]
 pub use pool::MqttPool;
