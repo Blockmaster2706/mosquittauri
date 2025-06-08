@@ -17,6 +17,7 @@ impl<'a, T> Lock<T> {
             .map_err(|_e| anyhow!("failed to get lock for client"))?))
     }
 
+    #[allow(dead_code)]
     pub fn with_mut<R>(&'a self, f: impl FnOnce(RwLockWriteGuard<T>) -> R) -> Result<R> {
         Ok(f(self
             .lock

@@ -1,6 +1,6 @@
 use tauri::AppHandle;
 
-use crate::ipc::event::{MsqtEvent, TopicError, TopicUpdate};
+use crate::ipc::event::{MsqtEvent, TopicError, TopicStateEvent, TopicUpdate};
 use crate::model::{Session, Topic};
 
 #[tauri::command]
@@ -19,6 +19,7 @@ pub async fn set_topic_enabled(id: u64, enabled: bool, app: AppHandle) -> tauri:
         log::error!("Failed to create topic: {e}");
         TopicError::new(&e).send(&app)?;
     }
+    TopicStateEvent::new(id).send(&app)?;
     TopicUpdate::from_all(&app)?.send(&app)
 }
 

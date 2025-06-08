@@ -6,7 +6,7 @@ use tauri::{AppHandle, Listener};
 use crate::{
     ipc::event::{
         MqttConnectEvent, MqttDisconnectEvent, MqttDisconnectRequest, MqttError, MqttPullEvent,
-        MqttSendEvent, MsqtEvent,
+        MqttSendEvent, MsqtEvent, TopicStateEvent,
     },
     model::{MsqtDao, Server, Session, Topic},
     mqtt::MqttPool,
@@ -48,13 +48,32 @@ fn mqtt_connect_internal(app: &AppHandle) -> Result<()> {
     });
 
     // Subscribe to all topics for selected server
-
-    if let Err(e) = &pool
-        .get_topic_sender()
-        .send(Topic::find_enabled_by_selected_server()?.context("No server selected")?)
+    let topic_sender = pool.get_topic_sender();
+    if let Err(e) =
+        topic_sender.send(Topic::find_enabled_by_selected_server()?.context("No server selected")?)
     {
-        log::error!("Failed to subscribe to topic {e}")
+        log::error!("Failed to subscribe to topics {e}")
     }
+
+    app.listen(TopicStateEvent::ID, move |event| {
+        let state_event = match serde_json::from_str::<TopicStateEvent>(event.payload()) {
+            Ok(event) => event,
+            Err(e) => {
+                log::warn!("Failed to parse send event: {e}");
+                return;
+            }
+        };
+        let topic = match Topic::find_by_id(state_event.id()) {
+            Ok(topic) => topic,
+            Err(e) => {
+                log::error!("Failed to get changed topic:  {e}");
+                return;
+            }
+        };
+        if let Err(e) = topic_sender.send(vec![topic]) {
+            log::error!("Faled to send topic state to mqtt pool {e}")
+        }
+    });
 
     MqttConnectEvent::new().send(app)?;
     let msg_receiver = pool
