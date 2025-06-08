@@ -14,6 +14,9 @@ impl MsqtDao for Server {
             .find_all()
             .context("Failed to get full server list")
     }
+    /*
+     * SELECT * FROM Server;
+    */
 }
 
 impl Server {
@@ -39,12 +42,19 @@ impl Server {
             .context("Failed to add server")?;
         Ok(server)
     }
+    /*
+     * INSERT INTO Server (id, name, url, port, client_id)
+     * VALUES ({gen_id()}, {name}, {url}, {port}, {client_id});
+    */
 
     pub fn delete(id: u64) -> Result<()> {
         log::info!("deleting server with id {id}");
         STORAGE.get_mut()?.delete(id)?;
         Ok(())
     }
+    /*
+     * DELETE FROM Sever WHERE id = {id};
+    */
 
     pub fn update(
         id: u64,
@@ -63,6 +73,14 @@ impl Server {
             server.client_id = client_id.into();
         })
     }
+    /*
+     * UPDATE Server
+     * SET name = {name},
+     * url = {url},
+     * port = {port},
+     * client_id = {client_id},
+     * WHERE id = {id};
+    */
 
     #[allow(dead_code)]
     pub fn find_by_name(name: &str) -> Result<Self> {
@@ -71,4 +89,8 @@ impl Server {
             .find(|server| server.name == name)
             .context(format!("No Server named {name} found"))
     }
+    /*
+     * SELECT * FROM Server
+     * WHERE name LIKE '%{name}%';
+    */
 }

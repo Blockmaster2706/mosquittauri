@@ -15,6 +15,7 @@ impl MsqtDao for Topic {
             .find_all()
             .context("Failed to get full server list")
     }
+    // SELECT * FROM Topic;
 }
 
 impl Topic {
@@ -30,12 +31,21 @@ impl Topic {
         STORAGE.get_mut()?.insert(topic.clone())?;
         Ok(topic)
     }
+    /*
+     * INSERT INTO Topic (id, fk_server_id, name, enabled)
+     * VALUES ({get_id()}, {server_id}, {name}, 0);
+    */
 
     pub fn update(id: u64, name: impl Into<String>) -> Result<()> {
         let name = name.into();
         log::info!("updating topic {name}");
         STORAGE.get_mut()?.edit(id, |topic| topic.name = name)
     }
+    /*
+     * UPDATE Topic
+     * SET name = {name}
+     * WHERE id = {id};
+    */
 
     pub fn set_enabled(topic_id: u64, enabled: bool) -> Result<()> {
         STORAGE.get_mut()?.edit(topic_id, |topic| {
@@ -43,6 +53,11 @@ impl Topic {
             topic.enabled = enabled
         })
     }
+    /*
+     * UPDATE Topic
+     * SET enabled = {enabled}
+     * WHERE id = {id};
+    */
 
     #[allow(dead_code)]
     pub fn find_enabled_by_server(server_id: u64) -> Result<Vec<Topic>> {
@@ -52,6 +67,10 @@ impl Topic {
             .filter(|t: &Topic| t.enabled && t.server_id() == server_id)
             .collect())
     }
+    /*
+     * SELECT * FROM Topic
+     * WHERE fk_server_id = {server_id} AND enabled = 1;
+    */
 
     pub fn find_by_server(server_id: u64) -> Result<Vec<Topic>> {
         log::info!("getting topics for server with id");
@@ -60,6 +79,10 @@ impl Topic {
             .filter(|t: &Topic| t.server_id() == server_id)
             .collect())
     }
+    /*
+     * SELECT * FROM Topic
+     * WHERE fk_server_id = {server_id};
+    */
 
     #[allow(dead_code)]
     pub fn find_by_selected_server() -> Result<Option<Vec<Topic>>> {
@@ -85,9 +108,17 @@ impl Topic {
         })?;
         todo!()
     }
+    /*
+     * DELETE FROM Topic
+     * WHERE fk_server_id = {server_id};
+    */
 
     pub fn delete(id: u64) -> Result<()> {
         log::info!("deleting topic with id {id}");
         STORAGE.get_mut()?.delete(id)
     }
+    /*
+     * DELETE FROM Topic
+     * WHERE id = {id};
+    */
 }

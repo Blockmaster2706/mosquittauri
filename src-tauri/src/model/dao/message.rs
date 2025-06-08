@@ -11,6 +11,9 @@ impl MsqtDao for Message {
     fn find_all() -> Result<Vec<Self>> {
         STORAGE.get()?.find_all()
     }
+    /*
+     * SELECT * FROM Messages;
+    */
 }
 
 impl Message {
@@ -24,3 +27,7 @@ impl Message {
         })
     }
 }
+/*
+ * INSERT INTO Messages (id, fk_server_id, topic, payload, timestamp)
+ * VALUES ({gen_id()}, {server_id}, {topic}, {payload}, {Local::now().timestamp()});
+*/
