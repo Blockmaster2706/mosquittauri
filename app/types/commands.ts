@@ -9,7 +9,8 @@ enum commands {
 	edit_topic = "edit_topic",
 	delete_topic = "delete_topic",
 	set_topic_enabled = "set_topic_enabled",
-	listen_all_topics = "listen_all_topics",
+	is_listen_all_topics = "is_listen_all_topics",
 	set_listen_all_topics = "set_listen_all_topics",
+	mqtt_connect = "mqtt_connect",
 }
 export default commands;
