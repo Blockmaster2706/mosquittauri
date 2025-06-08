@@ -11,6 +11,7 @@ mod topic;
 
 pub trait MsqtDao: Sized + MsqtDto {
     fn find_all() -> Result<Vec<Self>>;
+    #[allow(dead_code)]
     /// get latest version of object from database
     fn update(mut self) -> Result<Self> {
         self = Self::find_by_id(self.id())
