@@ -49,29 +49,7 @@ export default function SettingsPage({
 
 	const [mode, setMode] = useState(Mode.ServerList);
 	const [topic, setTopic] = useState("");
-	const [serverList, setServerList] = useState<Server[]>([
-		{
-			id: 0,
-			name: "Mosquitto",
-			url: "localhost",
-			port: 1883,
-			clientId: "mosquittauri-client-0",
-		},
-		{
-			id: 1,
-			name: "HiveMQ",
-			url: "broker.hivemq.com",
-			port: 1883,
-			clientId: "mosquittauri-client-1",
-		},
-		{
-			id: 2,
-			name: "EMQX",
-			url: "broker.emqx.io",
-			port: 1883,
-			clientId: "mosquittauri-client-2",
-		},
-	]);
+	const [serverList, setServerList] = useState<Server[]>([]);
 	const [serverToEdit, setServerToEdit] = useState<Server>({
 		id: 0,
 		name: "",
@@ -79,7 +57,7 @@ export default function SettingsPage({
 		port: 1883,
 		clientId: "",
 	});
-	const [selectedServerID, setSelectedServerID] = useState<number>(0);
+	const [selectedServerID, setSelectedServerID] = useState<number>(-1);
 
 	const input_classname =
 		"w-[calc(100%-10px)] bg-transparent text-base text-gray20 border-b-[2px] border-gray20 outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 focus:border-[var(--accent)]";
@@ -270,7 +248,10 @@ export default function SettingsPage({
 							}
 							handleClick={handleClick}
 							setAddTopicMode={() => setMode(Mode.AddTopic)}
-							onBackClick={() => setMode(Mode.ServerList)}
+							onBackClick={() => {
+								setSelectedServerID(-1);
+								setMode(Mode.ServerList);
+							}}
 						/>
 					</div>
 
@@ -296,10 +277,8 @@ export default function SettingsPage({
 				</label>
 				<button
 					title={address === "" ? "Please input a Server Address" : ""}
-					disabled={address === ""}
-					onClick={() => {
-						setConnected(!connected);
-					}}
+					disabled={selectedServerID === -1}
+					onClick={() => invoke(commands.mqtt_connect)}
 					className={settingsButtonClassname}
 				>
 					Connect

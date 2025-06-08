@@ -7,7 +7,7 @@ import SettingsPage from "./settings-pane/settings-pane";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { topic } from "./types";
 import SecondarySidebar from "./secondary-sidebar";
-import LogsMessageView from "./logs-message-view";
+import LogsMessageView, { logMessage } from "./logs-message-view";
 
 export default function Home() {
 	const [isLogsPaneActive, setLogsPaneActive] = useState(false);
@@ -17,19 +17,58 @@ export default function Home() {
 	const [topic, setTopic] = useState<topic | null>(null);
 
 	const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([]);
+	const [logMessageArray, setLogMessageArray] = useState<logMessage[]>([]);
 
 	useEffect(() => {
+		const logUnlisten = listen("log", (event) => {
+			setLogMessageArray((prevMessages: logMessage[]) => {
+				const newMessage = event.payload as logMessage;
+				return [...prevMessages, newMessage];
+			});
+		});
+
 		let unlisten: UnlistenFn | undefined;
 
 		const setupListener = async () => {
-			await listen<message>("newMessage", (payload) => {
-				setMQTTMessageArray((prevState) => [...prevState, payload.payload]);
+			type MQTTPayloadPayload = {
+				messages: MQTTPayload[];
+			};
+			type MQTTPayload = {
+				topic?: string;
+				payload?: string;
+				timestamp?: number;
+			};
+
+			await listen<MQTTPayloadPayload>("mqtt-pull", (payload) => {
+				console.log("Received MQTT pull event:", payload);
+				if (!payload.payload || typeof payload.payload !== "object") {
+					console.error("Invalid MQTT payload received:", payload);
+					return;
+				}
+				const mqttPayload = payload.payload.messages[0];
+				console.log("MQTT payload:", mqttPayload);
+				if (!mqttPayload.topic || !mqttPayload.payload) {
+					console.error("MQTT payload missing topic or payload:", mqttPayload);
+					return;
+				}
+				const message: message = {
+					topic: mqttPayload.topic,
+					message: mqttPayload.payload,
+					timestamp: mqttPayload.timestamp
+						? new Date(mqttPayload.timestamp).toLocaleTimeString()
+						: new Date().toLocaleTimeString(),
+				};
+
+				console.log("Received MQTT message:", payload);
+
+				setMQTTMessageArray((prevState) => [...prevState, message]);
 			});
 		};
 
 		setupListener();
 
 		return () => {
+			logUnlisten.then((f) => f());
 			if (unlisten) {
 				// Check if unlisten is defined
 				unlisten();
@@ -56,7 +95,9 @@ export default function Home() {
 							{!isLogsPaneActive && (
 								<MessageView messageArray={MQTTMessageArray} />
 							)}
-							{isLogsPaneActive && <LogsMessageView />}
+							{isLogsPaneActive && (
+								<LogsMessageView messageArray={logMessageArray} />
+							)}
 						</div>
 						<div className="h-[122px] -mt-30 relative flex flex-col">
 							<div className="h-[42px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
