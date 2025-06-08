@@ -12,6 +12,7 @@ interface TopicListProps {
 	setAddTopicMode: () => void;
 	onBackClick: () => void;
 	setExternalTopicList: (value: topic[]) => void;
+	isMqttConnected: boolean;
 }
 
 export default function TopicList({
@@ -21,6 +22,7 @@ export default function TopicList({
 	setAddTopicMode,
 	onBackClick,
 	setExternalTopicList,
+	isMqttConnected,
 }: TopicListProps) {
 	const [topicList, setTopicList] = useState<topic[]>([]);
 
@@ -59,6 +61,7 @@ export default function TopicList({
 		<div
 			className="h-full w-full"
 			onMouseUpCapture={(event) => {
+				if (isMqttConnected) return;
 				console.log("Mouse up event:", event.button);
 				if (event.button === 3) {
 					onBackClick();
@@ -113,6 +116,12 @@ export default function TopicList({
 				<button
 					className={settingsButtonClassname}
 					onClick={() => onBackClick()}
+					disabled={isMqttConnected}
+					title={
+						isMqttConnected
+							? "Cannot go back while connected to MQTT"
+							: "Go back to server list"
+					}
 				>
 					Back
 				</button>
