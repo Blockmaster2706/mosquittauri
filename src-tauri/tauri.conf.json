@@ -22,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self'"
+      "csp": null
     }
   },
   "bundle": {
