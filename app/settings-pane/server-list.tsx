@@ -4,6 +4,7 @@ import { settingsButtonClassname } from "./settings-pane";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import commands from "../types/commands";
+import { EditIcon } from "../icons";
 
 interface ServerListProps {
 	serverList: Server[];
@@ -55,10 +56,10 @@ export default function ServerList({
 						return (
 							<li
 								key={server.id}
-								className="w-[calc(100%-10px)] mt-2 bg-gray60 border-gray100 border-1 grid grid-cols-10"
+								className="w-[calc(100%-10px)] mt-2 bg-gray60 border-gray100 border-1 grid grid-cols-12"
 							>
 								<button
-									className="ml-1 col-span-8 text-left"
+									className="ml-1 col-span-10 text-left"
 									title={server.url + ":" + server.port}
 									onClick={() =>
 										invoke(commands.select_server, { id: server.id })
@@ -67,14 +68,14 @@ export default function ServerList({
 									{server.name}
 								</button>
 								<button
-									className="col-span-1 col-start-10"
+									className="col-span-2 col-start-11"
 									title="edit"
 									onClick={() => {
 										setServerToEdit(server);
 										setEditMode();
 									}}
 								>
-									X
+									<EditIcon className="w-5 h-5 text-gray20 hover:text-gray40" />
 								</button>
 							</li>
 						);

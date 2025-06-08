@@ -138,3 +138,19 @@ export function ManualScrollIcon(props: React.SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function EditIcon(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			height={40}
+			viewBox="0 0 8 8"
+			width={40}
+			fill="currentcolor"
+			role="img"
+			{...props}
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d="m6 0-1 1 2 2 1-1zm-2 2-4 4v2h2l4-4z" />
+		</svg>
+	);
+}
