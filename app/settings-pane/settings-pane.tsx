@@ -49,29 +49,7 @@ export default function SettingsPage({
 
 	const [mode, setMode] = useState(Mode.ServerList);
 	const [topic, setTopic] = useState("");
-	const [serverList, setServerList] = useState<Server[]>([
-		{
-			id: 0,
-			name: "Mosquitto",
-			url: "localhost",
-			port: 1883,
-			clientId: "mosquittauri-client-0",
-		},
-		{
-			id: 1,
-			name: "HiveMQ",
-			url: "broker.hivemq.com",
-			port: 1883,
-			clientId: "mosquittauri-client-1",
-		},
-		{
-			id: 2,
-			name: "EMQX",
-			url: "broker.emqx.io",
-			port: 1883,
-			clientId: "mosquittauri-client-2",
-		},
-	]);
+	const [serverList, setServerList] = useState<Server[]>([]);
 	const [serverToEdit, setServerToEdit] = useState<Server>({
 		id: 0,
 		name: "",
