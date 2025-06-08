@@ -15,6 +15,7 @@ use ipc::{
     event::{LogEvent, MsqtEvent},
 };
 use log::LevelFilter;
+use model::Session;
 use tauri::AppHandle;
 use tauri_plugin_log::{
     fern::{log_file, Dispatch, Output},
@@ -56,6 +57,7 @@ pub fn run() -> Result<()> {
             command::mqtt_connect,
         ])
         .setup(|app| {
+            Session::get_or_init().context("Failed to init session")?;
             let sender = start_log_event_listener(app.handle().clone());
             let handle = app.handle();
             handle.plugin(
@@ -65,7 +67,7 @@ pub fn run() -> Result<()> {
                         let now = Local::now();
                         out.finish(format_args!(
                             "{}|{}|{}|{} ::: {}",
-                            now.format("%Y.%m.%d"),
+                            now.format("%Y-%m-%d"),
                             now.format("%H:%M:%S"),
                             record.module_path().unwrap_or("???"),
                             record.level(),

@@ -7,7 +7,7 @@ import SettingsPage from "./settings-pane/settings-pane";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { topic } from "./types";
 import SecondarySidebar from "./secondary-sidebar";
-import LogsMessageView from "./logs-message-view";
+import LogsMessageView, { logMessage } from "./logs-message-view";
 
 export default function Home() {
 	const [isLogsPaneActive, setLogsPaneActive] = useState(false);
@@ -17,25 +17,113 @@ export default function Home() {
 	const [topic, setTopic] = useState<topic | null>(null);
 
 	const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([]);
+	const [logMessageArray, setLogMessageArray] = useState<logMessage[]>([]);
+
+	const [autoScrollingDisabled, setAutoScrollingDisabled] = useState(false);
+
+	const [errorCount, setErrorCount] = useState(0);
+	const [warningCount, setWarningCount] = useState(0);
 
 	useEffect(() => {
+		const logUnlisten = listen("log", (event) => {
+			const newMessage = event.payload as logMessage;
+
+			console.log("Log message array updated:", newMessage);
+			if (newMessage?.level.toLowerCase() === "error" && !isLogsPaneActive) {
+				setErrorCount((prevCount) => prevCount + 1);
+			}
+			if (newMessage?.level.toLowerCase() === "warning" && !isLogsPaneActive) {
+				setWarningCount((prevCount) => prevCount + 1);
+			}
+
+			setLogMessageArray((prevMessages: logMessage[]) => {
+				return [...prevMessages, newMessage];
+			});
+		});
+
+		const mqttConnectUnlisten = listen("mqtt-connect", () => {
+			console.log("MQTT connected");
+			setIsMQTTConnected(true);
+		});
+
+		const mqttDisconnectUnlisten = listen("mqtt-disconnect", () => {
+			console.log("MQTT disconnected");
+			setIsMQTTConnected(false);
+		});
+
 		let unlisten: UnlistenFn | undefined;
 
 		const setupListener = async () => {
-			await listen<message>("newMessage", (payload) => {
-				setMQTTMessageArray((prevState) => [...prevState, payload.payload]);
+			type MQTTPayloadPayload = {
+				messages: MQTTPayload[];
+			};
+			type MQTTPayload = {
+				topic?: string;
+				payload?: string;
+				timestamp?: number;
+			};
+
+			await listen<MQTTPayloadPayload>("mqtt-pull", (payload) => {
+				console.log("Received MQTT pull event:", payload);
+				if (!payload.payload || typeof payload.payload !== "object") {
+					console.error("Invalid MQTT payload received:", payload);
+					return;
+				}
+				const mqttPayload = payload.payload.messages[0];
+				console.log("MQTT payload:", mqttPayload);
+				if (!mqttPayload.topic || !mqttPayload.payload) {
+					console.error("MQTT payload missing topic or payload:", mqttPayload);
+					return;
+				}
+				const message: message = {
+					topic: mqttPayload.topic,
+					message: mqttPayload.payload,
+					timestamp: mqttPayload.timestamp
+						? new Date(mqttPayload.timestamp).toLocaleTimeString()
+						: new Date().toLocaleTimeString(),
+				};
+
+				console.log("Received MQTT message:", payload);
+
+				setMQTTMessageArray((prevState) => [...prevState, message]);
 			});
 		};
 
 		setupListener();
 
 		return () => {
+			logUnlisten.then((f) => f());
+			mqttConnectUnlisten.then((f) => f());
+			mqttDisconnectUnlisten.then((f) => f());
 			if (unlisten) {
 				// Check if unlisten is defined
 				unlisten();
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`message-${MQTTMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [MQTTMessageArray]);
+
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`log-message-${logMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [logMessageArray]);
 
 	return (
 		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -56,7 +144,9 @@ export default function Home() {
 							{!isLogsPaneActive && (
 								<MessageView messageArray={MQTTMessageArray} />
 							)}
-							{isLogsPaneActive && <LogsMessageView />}
+							{isLogsPaneActive && (
+								<LogsMessageView messageArray={logMessageArray} />
+							)}
 						</div>
 						<div className="h-[122px] -mt-30 relative flex flex-col">
 							<div className="h-[42px] w-full col-start-5 col-span-14 mt-18 bg-transparent z-30">
@@ -73,7 +163,7 @@ export default function Home() {
 					</div>
 
 					<div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
-						<div className="mb-5 -mt-17 h-34 w-12">
+						<div className="mb-5 -mt-17 h-51 w-12">
 							<SecondarySidebar
 								sendButtonEnabled={isMQTTConnected}
 								inputValue={inputValue}
@@ -81,6 +171,12 @@ export default function Home() {
 								setInputValue={setInputValue}
 								isShowingLogs={isLogsPaneActive}
 								setShowingLogs={setLogsPaneActive}
+								autoScrollingDisabled={autoScrollingDisabled}
+								setAutoScrollDisabled={setAutoScrollingDisabled}
+								errorCount={errorCount}
+								setErrorCount={setErrorCount}
+								warningCount={warningCount}
+								setWarningCount={setWarningCount}
 							/>
 						</div>
 					</div>

@@ -11,6 +11,8 @@ interface TopicListProps {
 	handleClick: (topic: topic) => void;
 	setAddTopicMode: () => void;
 	onBackClick: () => void;
+	setExternalTopicList: (value: topic[]) => void;
+	isMqttConnected: boolean;
 }
 
 export default function TopicList({
@@ -19,6 +21,8 @@ export default function TopicList({
 	handleClick,
 	setAddTopicMode,
 	onBackClick,
+	setExternalTopicList,
+	isMqttConnected,
 }: TopicListProps) {
 	const [topicList, setTopicList] = useState<topic[]>([]);
 
@@ -36,12 +40,9 @@ export default function TopicList({
 					break;
 				}
 			}
-			invoke(commands.set_listen_all_topics, {
-				enabled: allTopicsEnabled,
-				serverId: selected_server_id,
-			});
 
 			setTopicList(newTopicList.list);
+			setExternalTopicList(newTopicList.list);
 		});
 
 		invoke(commands.get_topics);
@@ -54,14 +55,16 @@ export default function TopicList({
 
 	return (
 		<div
+			className="h-full w-full"
 			onMouseUpCapture={(event) => {
+				if (isMqttConnected) return;
 				console.log("Mouse up event:", event.button);
 				if (event.button === 3) {
 					onBackClick();
 				}
 			}}
 		>
-			<div className="w-full h-full max-h-[48%] mt-1">
+			<div className="w-full h-full max-h-[90%] mt-1">
 				<label>
 					Current Server:{" "}
 					<label className="text-[var(--accent)]">{serverName}</label>
@@ -73,7 +76,7 @@ export default function TopicList({
 				>
 					New Topic
 				</button>
-				<ol className="w-full h-full overflow-y-scroll scrollbar-theme break-words">
+				<ol className="w-full h-full max-h-[50vh] overflow-y-scroll scrollbar-theme break-words mt-2 mb-3">
 					{topicList.map((topic) => {
 						return (
 							<li
@@ -106,6 +109,18 @@ export default function TopicList({
 						);
 					})}
 				</ol>
+				<button
+					className={settingsButtonClassname}
+					onClick={() => onBackClick()}
+					disabled={isMqttConnected}
+					title={
+						isMqttConnected
+							? "Cannot go back while connected to MQTT"
+							: "Go back to server list"
+					}
+				>
+					Back
+				</button>
 			</div>
 		</div>
 	);
