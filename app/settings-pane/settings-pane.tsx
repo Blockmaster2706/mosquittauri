@@ -10,7 +10,7 @@ import { Server } from "../types/server";
 import { invoke } from "@tauri-apps/api/core";
 import EditServer from "./edit-server";
 import commands from "../types/commands";
-import { listen } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 
 interface SettingsPageProps {
 	topicList: topic[];
@@ -279,10 +279,14 @@ export default function SettingsPage({
 				<button
 					title={address === "" ? "Please input a Server Address" : ""}
 					disabled={selectedServerID === -1}
-					onClick={() => invoke(commands.mqtt_connect)}
+					onClick={
+						connected
+							? () => emit("mqtt-disconnect")
+							: () => invoke(commands.mqtt_connect)
+					}
 					className={settingsButtonClassname}
 				>
-					Connect
+					{connected ? "Disconnect" : "Connect"}
 				</button>
 			</div>
 		</div>
