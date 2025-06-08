@@ -1,0 +1,38 @@
+sequenceDiagram
+    User->>+Frontend: run program
+    User->>Frontend: Create Server
+    User->>Frontend: Create Topics
+    User->>Frontend: Connect to selected Server
+    Frontend->>+Backend: mqtt_connect()
+    Backend->>+Mqtt Broker: connect to server
+    Backend->>Mqtt Broker: subscribe to enabled topics
+    Backend-->>Frontend: event: mqtt_connect 
+    Frontend-->>User: display connection status
+    User->>Frontend: Subscribe to Topic A
+    Frontend->>+Backend: set_topic_enabled(Topic A, true)
+    Backend->>Mqtt Broker: subscribe to Topic A
+    Backend-->>-Frontend: event: topic is enabled
+    Backend->>+Backend: Listen to Messages
+    Mqtt Broker->>Backend: new message
+    Backend-->>Frontend: event: new message
+    Frontend-->>User: Display Message
+    opt unsubscribe
+        User->>Frontend: Unsubscribe from Topic A
+        Frontend->>Backend: set_topic_enabled(Topic A, false)
+        Backend->>Mqtt Broker: Unsubscribe from Topic A
+    end
+    Backend-->>-Backend: keep listening or unsubscribe
+    User->>Frontend: send message
+    Frontend->>+Backend: event: mqtt_send Messages
+    Backend->>-Mqtt Broker: publish message
+    opt connection error
+        Mqtt Broker-->>Backend: Connection Terminated
+        Backend-->>Frontend: event: mqtt_disconnect
+        Frontend-->>User: display connection status
+    end
+    User->>Frontend: Disconnect from Server
+    Frontend->>Backend: event: mqtt_disconnect_requested
+    Backend->>Mqtt Broker: disconnect from server
+    Mqtt Broker-->>-Backend: disconnected
+    Backend-->>-Frontend: event: mqtt_disconnect
+    Frontend-->>User: display connection status
