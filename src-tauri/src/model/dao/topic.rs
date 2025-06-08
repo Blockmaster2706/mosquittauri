@@ -79,13 +79,10 @@ impl Topic {
     }
 
     pub fn delete_by_server(server_id: u64) -> Result<()> {
-        // STORAGE.get_mut()?.update(|topics| {
-        //     *topics = topics
-        //         .iter_mut()
-        //         .filter(|topic| topic.server_id() != server_id)
-        //         .collect();
-        //     Ok(())
-        // })?;
+        STORAGE.get_mut()?.update(|topics| {
+            topics.retain(|topic| topic.server_id() != server_id);
+            Ok(())
+        })?;
         todo!()
     }
 
