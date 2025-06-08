@@ -26,6 +26,7 @@ impl MsqtEvent for MqttDisconnectEvent {
     const ID: &str = id::MQTT_DISCONNECT;
 }
 
+#[allow(unused)]
 impl MqttDisconnectEvent {
     pub const ID: &str = id::MQTT_CONNECT;
     pub fn new() -> Self {
