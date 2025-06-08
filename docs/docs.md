@@ -56,7 +56,8 @@ Originally developed as a temporary solution until the SQL Integration exists, t
 
 ### 5, Building Block View
 
-#### TODO: CLASS DIAGRAM
+The following Diagram illustrates the classes and methods of the MQTT Part of the Backend
+![Showing how MQTT Communication works in MSQT](classes.svg)
 
 ### 6. Runtime View
 
@@ -83,6 +84,7 @@ We use a Github Actions Pipeline to automatically build the Application for mult
 | Title                       | Description                                                                                                                                                                                                                                                                                                                                                      |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | No Developers using Windows | None of the Developers working on Mosquittauri are using Windows, neither for Development, nor much for Private Use. As thus, the Application was not thoroughly tested on Windows until the end. This Risk is mitigated by the fact that the Github Actions Pipeline always builds and tests on Windows as well, but some behavior might be slightly different. |
+| No CSP                      | We have set our Content Security Policy to None because we had issues in the final build. Normally, this is highly discouraged, but we ran out of time and could not fix this properly.                                                                                                                                                                          |
 
 ### 9.2 Technical Debts
 
