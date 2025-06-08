@@ -174,26 +174,9 @@ export default function SettingsPage({
 							input_classname={input_classname}
 							onBackClick={() => setMode(Mode.ServerList)}
 							onAddClick={(name: string, url: string, port: number) => {
-								// Convert URL format properly
-								let hostname;
-								try {
-									// Add protocol if missing, so we can extract hostname properly
-									if (
-										!url.startsWith("http://") &&
-										!url.startsWith("https://")
-									) {
-										hostname = new URL(`http://${url}`);
-									} else {
-										hostname = new URL(url);
-									}
-								} catch (e) {
-									// If URL is invalid, just use it as is
-									console.error("Invalid URL:", e);
-								}
-
 								invoke(commands.add_server, {
 									name: name,
-									url: hostname,
+									url: url,
 									port: port,
 									clientId: `mosquittauri-client-${serverList.length}`,
 								});
@@ -253,6 +236,7 @@ export default function SettingsPage({
 								setMode(Mode.ServerList);
 							}}
 							setExternalTopicList={setTopicList}
+							isMqttConnected={connected}
 						/>
 					</div>
 
