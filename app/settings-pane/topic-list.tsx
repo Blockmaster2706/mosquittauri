@@ -11,6 +11,7 @@ interface TopicListProps {
 	handleClick: (topic: topic) => void;
 	setAddTopicMode: () => void;
 	onBackClick: () => void;
+	setExternalTopicList: (value: topic[]) => void;
 }
 
 export default function TopicList({
@@ -19,6 +20,7 @@ export default function TopicList({
 	handleClick,
 	setAddTopicMode,
 	onBackClick,
+	setExternalTopicList,
 }: TopicListProps) {
 	const [topicList, setTopicList] = useState<topic[]>([]);
 
@@ -42,6 +44,7 @@ export default function TopicList({
 			});
 
 			setTopicList(newTopicList.list);
+			setExternalTopicList(newTopicList.list);
 		});
 
 		invoke(commands.get_topics);

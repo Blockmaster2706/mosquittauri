@@ -107,7 +107,7 @@ export default function Home() {
 									inputValue={inputValue}
 									setInputValue={setInputValue}
 									topicList={topicList}
-									enabled={isMQTTConnected}
+									enabled={true}
 								/>
 							</div>
 						</div>
