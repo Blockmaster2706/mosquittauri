@@ -70,30 +70,28 @@ The following Diagram shows the Process of how MSQT communicates with the MQTT B
 
 We use a Github Actions Pipeline to automatically build the Application for multiple Platforms, including Windows, Linux and MacOS. This ensures consistent and reproducible builds, as well as giving us multiple "snapshots" of how the Program behaved throughout versions.
 
-## 8. Concepts
+## 8. Architectural Decisions
 
-#### TODO: GENUTZTE PATTERNS
+- We use Node.js Version 22.x since it's the currently active LTS Node.js Version ([more info](https://nodejs.org/en/about/previous-releases))
+- Since Next.js Server Components are only ran at compile time, we have to use the Rust Backend provided by Tauri to do backend work on the machine. This includes how we do MQTT, SQL and other functions to manipulate the file system or interact with other systems.
+- Because this would require some very in-depth mocking of the Tauri Event system, or a very complicated Pipeline Setup, we decided later on **not** to do End-To-End Testing using Cypress. This results in the Frontend not being automatically tested.
 
-## 9. Architectural Decisions
+## 9. Risks and Technical Debts
 
-#### TODO: WICHTIGE ENTSCHEIDUNGEN
-
-## 10. Risks and Technical Debts
-
-### 10.1 Risks
+### 9.1 Risks
 
 | Title                       | Description                                                                                                                                                                                                                                                                                                                                                      |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | No Developers using Windows | None of the Developers working on Mosquittauri are using Windows, neither for Development, nor much for Private Use. As thus, the Application was not thoroughly tested on Windows until the end. This Risk is mitigated by the fact that the Github Actions Pipeline always builds and tests on Windows as well, but some behavior might be slightly different. |
 
-### 10.2 Technical Debts
+### 9.2 Technical Debts
 
 | Title                    | Description                                                                                                                                                                                                                                                                             |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | No User-Defined ClientID | In Development, we forgot to add a way for the User to set the Client ID that is going to be sent to the Broker (Kind of like a username). We wanted to add this later on, but ran out of time.                                                                                         |
 | Ignored Warnings         | During Development and Deployment, we have sometimes opted to ignore Warnings. These warnings do not have an impact on the final Application, however they can have an impact on Code Quality. Due to Time Constraints, we have opted not to address these properly for the time being. |
 
-## 11. Glossary
+## 10. Glossary
 
 | Abbreviation | Description                                |
 | ------------ | ------------------------------------------ |
