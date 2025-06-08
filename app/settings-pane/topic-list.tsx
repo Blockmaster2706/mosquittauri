@@ -16,7 +16,6 @@ interface TopicListProps {
 }
 
 export default function TopicList({
-	selected_server_id,
 	serverName,
 	handleClick,
 	setAddTopicMode,
@@ -32,14 +31,6 @@ export default function TopicList({
 			console.log("Received topic update event:", event);
 			const newTopicList = updatedTopicList as { list: topic[] };
 			console.log("New topic list:", newTopicList);
-
-			let allTopicsEnabled: boolean = true;
-			for (const topic of newTopicList.list) {
-				if (!topic.enabled) {
-					allTopicsEnabled = false;
-					break;
-				}
-			}
 
 			setTopicList(newTopicList.list);
 			setExternalTopicList(newTopicList.list);
