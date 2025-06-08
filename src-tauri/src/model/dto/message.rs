@@ -13,7 +13,7 @@ pub struct Message {
     pub(in crate::model) fk_server_id: u64,
     pub(in crate::model) topic: String,
     pub(in crate::model) payload: String,
-    pub(in crate::model) outgoing: bool,
+    pub(in crate::model) timestamp: i64,
 }
 
 impl MsqtDto for Message {
@@ -31,18 +31,7 @@ impl TryFrom<Publish> for Message {
         let topic = pkt.topic;
         let payload =
             String::from_utf8(pkt.payload.to_vec()).context("Failed to parse mqtt payload")?;
-        Message::try_new(server_id, topic, payload, false)
-    }
-}
-impl TryFrom<MqttSendEvent> for Message {
-    type Error = Error;
-    fn try_from(event: MqttSendEvent) -> Result<Self> {
-        let server_id = Session::get_or_init()?
-            .server_id()
-            .context("No server selected")?;
-        let topic = event.topic().to_string();
-        let payload = event.payload().to_string();
-        Message::try_new(server_id, topic, payload, true)
+        Message::try_new(server_id, topic, payload)
     }
 }
 

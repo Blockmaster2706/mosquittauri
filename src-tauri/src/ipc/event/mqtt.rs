@@ -3,18 +3,34 @@ use tauri::{AppHandle, Emitter};
 
 use crate::model::Message;
 
-#[derive(Clone, Serialize)]
+use super::{id, MsqtEvent};
+
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MqttConnectEvent {}
-impl MqttConnectEvent {
-    pub const ID: &str = "mqtt-connect";
+
+impl MsqtEvent for MqttConnectEvent {
+    const ID: &str = id::MQTT_CONNECT;
 }
 
-#[derive(Clone, Serialize)]
+impl MqttConnectEvent {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MqttDisconnectEvent {}
+impl MsqtEvent for MqttDisconnectEvent {
+    const ID: &str = id::MQTT_DISCONNECT;
+}
+
 impl MqttDisconnectEvent {
-    pub const ID: &str = "mqtt-disconnect";
+    pub const ID: &str = id::MQTT_CONNECT;
+    pub fn new() -> Self {
+        Self {}
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -26,7 +42,7 @@ pub struct MqttSendEvent {
 
 #[allow(dead_code)]
 impl MqttSendEvent {
-    pub const ID: &str = "mqtt-send";
+    pub const ID: &str = id::MQTT_SEND;
     pub fn new(topic: impl Into<String>, payload: impl Into<String>) -> Self {
         Self {
             topic: topic.into(),
@@ -46,16 +62,36 @@ impl MqttSendEvent {
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MqttSyncEvent {
+pub struct MqttPullEvent {
     messages: Vec<Message>,
 }
-impl MqttSyncEvent {
+impl MqttPullEvent {
     #[allow(dead_code)]
-    pub const ID: &str = "mqtt-pull";
+    pub const ID: &str = id::MQTT_PULL;
     pub fn new(messages: Vec<Message>) -> Self {
         Self { messages }
     }
     pub fn send(&self, app: &AppHandle) -> tauri::Result<()> {
         app.emit(Self::ID, self)
+    }
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MqttError {
+    msg: String,
+}
+#[allow(unused)]
+impl MqttError {
+    const ID: &str = id::MQTT_ERROR;
+    pub fn new(msg: impl ToString) -> Self {
+        Self {
+            msg: msg.to_string(),
+        }
+    }
+    pub fn send(&self, app: &AppHandle) {
+        if let Err(e) = app.emit(Self::ID, self) {
+            log::error!("Failed to send Server Error Event: {e:?}");
+        }
     }
 }
