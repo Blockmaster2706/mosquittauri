@@ -21,10 +21,22 @@ export default function Home() {
 
 	const [autoScrollingDisabled, setAutoScrollingDisabled] = useState(false);
 
+	const [errorCount, setErrorCount] = useState(0);
+	const [warningCount, setWarningCount] = useState(0);
+
 	useEffect(() => {
 		const logUnlisten = listen("log", (event) => {
+			const newMessage = event.payload as logMessage;
+
+			console.log("Log message array updated:", newMessage);
+			if (newMessage?.level.toLowerCase() === "error" && !isLogsPaneActive) {
+				setErrorCount((prevCount) => prevCount + 1);
+			}
+			if (newMessage?.level.toLowerCase() === "warning" && !isLogsPaneActive) {
+				setWarningCount((prevCount) => prevCount + 1);
+			}
+
 			setLogMessageArray((prevMessages: logMessage[]) => {
-				const newMessage = event.payload as logMessage;
 				return [...prevMessages, newMessage];
 			});
 		});
@@ -158,6 +170,10 @@ export default function Home() {
 								setShowingLogs={setLogsPaneActive}
 								autoScrollingDisabled={autoScrollingDisabled}
 								setAutoScrollDisabled={setAutoScrollingDisabled}
+								errorCount={errorCount}
+								setErrorCount={setErrorCount}
+								warningCount={warningCount}
+								setWarningCount={setWarningCount}
 							/>
 						</div>
 					</div>
