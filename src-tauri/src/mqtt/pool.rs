@@ -140,6 +140,7 @@ impl MqttPool {
     }
 
     pub fn disconnect(self) {
+        log::info!("disconnecting mqtt pool");
         self.running.store(false, Ordering::Relaxed);
         if let Err(e) = self.msg_listener_handle.join() {
             log::warn!("Failed to stop message listener: {e:?}")
