@@ -1,22 +1,21 @@
-use tauri::{AppHandle, Url};
+use tauri::AppHandle;
 
 use crate::ipc::event::{ServerError, ServerSelected, ServerUpdate};
-use crate::model::{Server, Session};
+use crate::model::{Server, Session, Topic};
 
 #[tauri::command]
 pub async fn add_server(
     name: String,
-    url: Url,
+    url: String,
     port: u16,
     client_id: String,
     app: AppHandle,
 ) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Server::try_new(name, url, port, client_id) {
         log::error!("Failed to create server: {e}");
-        ServerError::send(&app, &e);
+        ServerError::new(&e).send(&app);
     }
-    ServerUpdate::send(&app)?;
+    ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
 
@@ -24,9 +23,9 @@ pub async fn add_server(
 pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
     if let Err(e) = Session::select_server(id) {
         log::error!("Failed to create server: {e}");
-        ServerError::send(&app, &e);
+        ServerError::new(&e).send(&app);
     }
-    ServerSelected::send(&app, id);
+    ServerSelected::new(id).send(&app);
     Ok(())
 }
 
@@ -34,30 +33,30 @@ pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
 pub async fn edit_server(
     id: u64,
     name: String,
-    url: Url,
+    url: String,
     port: u16,
     client_id: String,
     app: AppHandle,
 ) -> tauri::Result<()> {
-    // on_event.send()
     Server::update(id, name, url, port, client_id)
         .inspect_err(|e| log::error!("Failed to create server: {e}"))?;
-    ServerUpdate::send(&app)?;
+    ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
-    ServerUpdate::send(&app)?;
+    ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn delete_server(id: u64, app: AppHandle) -> tauri::Result<()> {
-    // on_event.send()
     if let Err(e) = Server::delete(id) {
         log::error!("Failed to create server: {e}");
-        ServerError::send(&app, &e);
+        ServerError::new(&e).send(&app);
     }
+    Topic::delete_by_server(id)?;
+    ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }

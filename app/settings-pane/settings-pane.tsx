@@ -8,6 +8,9 @@ import TopicList from "./topic-list";
 import ServerList from "./server-list";
 import { Server } from "../types/server";
 import { invoke } from "@tauri-apps/api/core";
+import EditServer from "./edit-server";
+import commands from "../types/commands";
+import { emit, listen } from "@tauri-apps/api/event";
 
 interface SettingsPageProps {
 	topicList: topic[];
@@ -22,6 +25,7 @@ enum Mode {
 	AddServer,
 	TopicList,
 	AddTopic,
+	EditServer,
 }
 
 export const settingsButtonClassname =
@@ -31,7 +35,6 @@ export default function SettingsPage({
 	topicList,
 	setTopicList,
 	connected,
-	setConnected,
 	address,
 }: SettingsPageProps) {
 	const themes = ["mosquittauri", "flashbang", "UwU"];
@@ -45,29 +48,15 @@ export default function SettingsPage({
 
 	const [mode, setMode] = useState(Mode.ServerList);
 	const [topic, setTopic] = useState("");
-	const [serverList, setServerList] = useState<Server[]>([
-		{
-			id: 0,
-			name: "Mosquitto",
-			url: "localhost",
-			port: 1883,
-			clientId: "mosquittauri-client-0",
-		},
-		{
-			id: 1,
-			name: "HiveMQ",
-			url: "broker.hivemq.com",
-			port: 1883,
-			clientId: "mosquittauri-client-1",
-		},
-		{
-			id: 2,
-			name: "EMQX",
-			url: "broker.emqx.io",
-			port: 1883,
-			clientId: "mosquittauri-client-2",
-		},
-	]);
+	const [serverList, setServerList] = useState<Server[]>([]);
+	const [serverToEdit, setServerToEdit] = useState<Server>({
+		id: 0,
+		name: "",
+		url: "",
+		port: 1883,
+		clientId: "",
+	});
+	const [selectedServerID, setSelectedServerID] = useState<number>(-1);
 
 	const input_classname =
 		"w-[calc(100%-10px)] bg-transparent text-base text-gray20 border-b-[2px] border-gray20 outline-none transition-opacity duration-300 placeholder:text-gray20 focus:opacity-100 focus:border-[var(--accent)]";
@@ -89,17 +78,16 @@ export default function SettingsPage({
 		if (value === "") return;
 		setTopicList([
 			...topicList,
-			{ id: topicList.length, name: value, selected: false },
+			{ id: topicList.length, name: value, enabled: false },
 		]);
 		setTopic(""); // Clear the input after submitting
 	};
 
-	const handleClick = (id: number) => {
-		const topicListCopy = [...topicList];
-		const index = topicList.findIndex((value) => value.id === id);
-		console.log(`${id} is currently ${topicListCopy[index].selected}`);
-		topicListCopy[index].selected = !topicListCopy[index].selected;
-		setTopicList(topicListCopy);
+	const handleClick = (topic: topic) => {
+		invoke(commands.set_topic_enabled, {
+			enabled: !topic.enabled,
+			id: topic.id,
+		});
 	};
 
 	useEffect(() => {
@@ -112,6 +100,25 @@ export default function SettingsPage({
 			document.documentElement.getAttribute("data-theme") || themes[0],
 		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	useEffect(() => {
+		const unlisten = listen("server-selected", (event) => {
+			const updatedServerID = event.payload;
+			console.log("Received server selecton update event:", event);
+			const newServerID = updatedServerID as { id: number };
+			console.log("New server selection:", newServerID);
+
+			setSelectedServerID(newServerID.id);
+			invoke(commands.get_topics);
+			setMode(Mode.TopicList);
+		});
+
+		invoke(commands.get_servers);
+
+		return () => {
+			unlisten.then((f) => f());
+		};
 	}, []);
 
 	return (
@@ -147,6 +154,8 @@ export default function SettingsPage({
 							serverList={serverList}
 							handleClick={() => setMode(Mode.AddServer)}
 							setServerList={setServerList}
+							setServerToEdit={setServerToEdit}
+							setEditMode={() => setMode(Mode.EditServer)}
 						/>
 					</div>
 
@@ -164,31 +173,42 @@ export default function SettingsPage({
 							input_classname={input_classname}
 							onBackClick={() => setMode(Mode.ServerList)}
 							onAddClick={(name: string, url: string, port: number) => {
-								// Convert URL format properly
-								let hostname;
-								try {
-									// Add protocol if missing, so we can extract hostname properly
-									if (
-										!url.startsWith("http://") &&
-										!url.startsWith("https://")
-									) {
-										hostname = new URL(`http://${url}`);
-									} else {
-										hostname = new URL(url);
-									}
-								} catch (e) {
-									// If URL is invalid, just use it as is
-									console.error("Invalid URL:", e);
-								}
-
-								invoke("add_server", {
+								invoke(commands.add_server, {
 									name: name,
-									url: hostname,
+									url: url,
 									port: port,
 									clientId: `mosquittauri-client-${serverList.length}`,
 								});
 								setMode(Mode.ServerList);
 							}}
+						/>
+					</div>
+
+					<div
+						className={`absolute w-full transition-transform duration-300 ease-in-out ${
+							mode === Mode.EditServer
+								? "translate-x-0"
+								: mode === Mode.ServerList
+									? "translate-x-full"
+									: "-translate-x-full"
+						}`}
+						style={{ opacity: mode === Mode.EditServer ? 1 : 0 }}
+					>
+						<EditServer
+							input_classname={input_classname}
+							onBackClick={() => setMode(Mode.ServerList)}
+							onAddClick={(server: Server) => {
+								console.log("Editing server:", server);
+								invoke(commands.edit_server, {
+									name: server.name,
+									url: server.url,
+									port: server.port,
+									clientId: server.clientId,
+									id: server.id,
+								});
+								setMode(Mode.EditServer);
+							}}
+							server={serverToEdit}
 						/>
 					</div>
 
@@ -202,7 +222,21 @@ export default function SettingsPage({
 						}`}
 						style={{ opacity: mode === Mode.TopicList ? 1 : 0 }}
 					>
-						<TopicList topicList={topicList} handleClick={handleClick} />
+						<TopicList
+							selected_server_id={selectedServerID}
+							serverName={
+								serverList.find((server) => server.id === selectedServerID)
+									?.name || "No Server Selected"
+							}
+							handleClick={handleClick}
+							setAddTopicMode={() => setMode(Mode.AddTopic)}
+							onBackClick={() => {
+								setSelectedServerID(-1);
+								setMode(Mode.ServerList);
+							}}
+							setExternalTopicList={setTopicList}
+							isMqttConnected={connected}
+						/>
 					</div>
 
 					<div
@@ -213,9 +247,9 @@ export default function SettingsPage({
 					>
 						<AddTopic
 							input_classname={input_classname}
-							topic={topic}
-							setTopic={setTopic}
+							serverID={selectedServerID}
 							handleKeyDown={handleKeyDown}
+							setTopicListMode={() => setMode(Mode.TopicList)}
 						/>
 					</div>
 				</div>
@@ -227,13 +261,15 @@ export default function SettingsPage({
 				</label>
 				<button
 					title={address === "" ? "Please input a Server Address" : ""}
-					disabled={address === ""}
-					onClick={() => {
-						setConnected(!connected);
-					}}
+					disabled={selectedServerID === -1}
+					onClick={
+						connected
+							? () => emit("mqtt-disconnect-request")
+							: () => invoke(commands.mqtt_connect)
+					}
 					className={settingsButtonClassname}
 				>
-					Connect
+					{connected ? "Disconnect" : "Connect"}
 				</button>
 			</div>
 		</div>

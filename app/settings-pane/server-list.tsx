@@ -3,26 +3,36 @@ import { Server } from "../types/server";
 import { settingsButtonClassname } from "./settings-pane";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import commands from "../types/commands";
+import { EditIcon } from "../icons";
 
 interface ServerListProps {
 	serverList: Server[];
 	handleClick: (id: number) => void;
 	setServerList: (value: Server[]) => void;
+	setServerToEdit: (value: Server) => void;
+	setEditMode: () => void;
 }
 
 export default function ServerList({
 	serverList,
 	handleClick,
 	setServerList,
+	setServerToEdit,
+	setEditMode,
 }: ServerListProps) {
 	useEffect(() => {
 		const unlisten = listen("server-update", (event) => {
-			const updatedServerList = event.payload as { list: Server[] };
+			const updatedServerList = event.payload;
+			console.log("Received server update event:", event);
+			const newServerList = updatedServerList as { list: Server[] };
+			console.log("New server list:", newServerList);
+
 			console.log("Received server update:", updatedServerList);
-			setServerList(updatedServerList.list);
+			setServerList(newServerList.list);
 		});
 
-		invoke("get_servers");
+		invoke(commands.get_servers);
 
 		return () => {
 			unlisten.then((f) => f());
@@ -46,16 +56,26 @@ export default function ServerList({
 						return (
 							<li
 								key={server.id}
-								className="w-[calc(100%-10px)] mt-2 bg-gray60 border-gray100 border-1 grid grid-cols-10"
+								className="w-[calc(100%-10px)] mt-2 bg-gray60 border-gray100 border-1 grid grid-cols-12"
 							>
-								<label
-									className="ml-1 col-span-8"
+								<button
+									className="ml-1 col-span-10 text-left"
 									title={server.url + ":" + server.port}
+									onClick={() =>
+										invoke(commands.select_server, { id: server.id })
+									}
 								>
 									{server.name}
-								</label>
-								<button className="col-span-1 col-start-10" title="edit">
-									X
+								</button>
+								<button
+									className="col-span-2 col-start-11"
+									title="edit"
+									onClick={() => {
+										setServerToEdit(server);
+										setEditMode();
+									}}
+								>
+									<EditIcon className="w-5 h-5 text-gray20 hover:text-gray40" />
 								</button>
 							</li>
 						);

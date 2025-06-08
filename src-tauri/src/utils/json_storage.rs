@@ -10,8 +10,8 @@ use anyhow::{Context, Result};
 
 use crate::model::MsqtDto;
 
-pub type StorageRead<T> = RwLockReadGuard<'static, JsonStorage<T>>;
-pub type StorageWrite<T> = RwLockWriteGuard<'static, JsonStorage<T>>;
+pub type JsonStorageRead<T> = RwLockReadGuard<'static, JsonStorage<T>>;
+pub type JsonStorageWrite<T> = RwLockWriteGuard<'static, JsonStorage<T>>;
 
 pub struct JsonStorageLock<T: MsqtDto> {
     lock: OnceLock<RwLock<JsonStorage<T>>>,
@@ -24,14 +24,14 @@ impl<T: MsqtDto> JsonStorageLock<T> {
             name,
         }
     }
-    pub fn get(&'static self) -> Result<StorageRead<T>> {
+    pub fn get(&'static self) -> Result<JsonStorageRead<T>> {
         self.lock
             .get_or_init(|| self.init_storage())
             .read()
             .map_err(|_e| anyhow!("failed to get lock for {} JsonStorage", self.name))
     }
 
-    pub fn get_mut(&'static self) -> Result<StorageWrite<T>> {
+    pub fn get_mut(&'static self) -> Result<JsonStorageWrite<T>> {
         self.lock
             .get_or_init(|| self.init_storage())
             .write()
@@ -118,10 +118,9 @@ impl<T: MsqtDto> JsonStorage<T> {
         self.update(|list| {
             let index = list
                 .iter()
-                .position(|obj| obj.id() != id)
+                .position(|obj| obj.id() == id)
                 .context(format!("No {} with the id {id}", name))?;
             list.remove(index);
-
             Ok(())
         })?;
         Ok(())

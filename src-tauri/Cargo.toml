@@ -35,7 +35,7 @@ anyhow = "1.0.98"
 chrono = { version = "0.4.41", features = ["serde"] }
 prost = { version = "0.13.5", features = ["derive"] }
 prost-types = "0.13.5"
-futures = "0.3.31"
+tokio = "1.45.1"
 
 [dev-dependencies]
 ntest = "0.9.3"
