@@ -70,7 +70,29 @@ The following Diagram shows the Process of how MSQT communicates with the MQTT B
 
 We use a Github Actions Pipeline to automatically build the Application for multiple Platforms, including Windows, Linux and MacOS. This ensures consistent and reproducible builds, as well as giving us multiple "snapshots" of how the Program behaved throughout versions.
 
-## 12. Glossary
+## 8. Concepts
+
+#### TODO: GENUTZTE PATTERNS
+
+## 9. Architectural Decisions
+
+#### TODO: WICHTIGE ENTSCHEIDUNGEN
+
+## 10. Risks and Technical Debts
+
+### 10.1 Risks
+
+| Title                       | Description                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No Developers using Windows | None of the Developers working on Mosquittauri are using Windows, neither for Development, nor much for Private Use. As thus, the Application was not thoroughly tested on Windows until the end. This Risk is mitigated by the fact that the Github Actions Pipeline always builds and tests on Windows as well, but some behavior might be slightly different. |
+
+### 10.2 Technical Debts
+
+| Title                    | Description                                                                                                                                                                                     |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No User-Defined ClientID | In Development, we forgot to add a way for the User to set the Client ID that is going to be sent to the Broker (Kind of like a username). We wanted to add this later on, but ran out of time. |
+
+## 11. Glossary
 
 | Abbreviation | Description                                |
 | ------------ | ------------------------------------------ |
