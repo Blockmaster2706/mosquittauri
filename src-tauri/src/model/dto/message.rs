@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, sqlx::FromRow)]
 pub struct Message {
     pub(in crate::model) id: u64,
     pub(in crate::model) topic: String,
