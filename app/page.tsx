@@ -19,6 +19,8 @@ export default function Home() {
 	const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([]);
 	const [logMessageArray, setLogMessageArray] = useState<logMessage[]>([]);
 
+	const [autoScrollingDisabled, setAutoScrollingDisabled] = useState(false);
+
 	useEffect(() => {
 		const logUnlisten = listen("log", (event) => {
 			setLogMessageArray((prevMessages: logMessage[]) => {
@@ -88,6 +90,26 @@ export default function Home() {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`message-${MQTTMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+	}, [MQTTMessageArray]);
+
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`log-message-${logMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+	}, [logMessageArray]);
+
 	return (
 		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
 			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-h-screen max-w-screen overflow-hidden">
@@ -126,7 +148,7 @@ export default function Home() {
 					</div>
 
 					<div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
-						<div className="mb-5 -mt-17 h-34 w-12">
+						<div className="mb-5 -mt-17 h-51 w-12">
 							<SecondarySidebar
 								sendButtonEnabled={isMQTTConnected}
 								inputValue={inputValue}
@@ -134,6 +156,8 @@ export default function Home() {
 								setInputValue={setInputValue}
 								isShowingLogs={isLogsPaneActive}
 								setShowingLogs={setLogsPaneActive}
+								autoScrollingDisabled={autoScrollingDisabled}
+								setAutoScrollDisabled={setAutoScrollingDisabled}
 							/>
 						</div>
 					</div>
