@@ -1,5 +1,10 @@
 //use anyhow::anyhow;
-use sqlx::migrate;
+use sqlx;
+use sqlx::{
+    migrate,
+    query,
+    //query_as
+};
 use std::fs::create_dir_all;
 
 use anyhow::{Context, Result};
@@ -43,10 +48,32 @@ pub struct SqliteStorage<T: MsqtDto> {
 impl<T: MsqtDto> SqliteStorage<T> {
     //try_new
     //update
+    pub async fn update(db: &Db, &mut self, action: impl FnOnce(&mut Vec<T>) -> Result<()>) -> Result<Vec<T>, anyhow::Error> {//parse action
+        let update = query!(r#UPDATE $1 SET
+                                #r, self, action).await.context("Unable to Update");
+        Ok(update)
+    }
     //find_all
+    pub async fn find_all(&self) -> Result<Vec<T>> {
+        if self.db.exists() {//skeleton
+
+            Ok(db)
+        } else {
+            Ok(Vec::new())
+        }
+    }
     //gen_id
+    pub async fn gen_id(&self) -> Result<u64> {
+        Ok(Self::gen_id_from_data(&self.find_all()?))//redundant?
+    }
     //gen_id_from_data
+    pub async fn gen_id_from_data(data: &[T]) -> u64 {
+        let id = query!(r#SELECT MAX(id) + 1 FROM $1#r, data).await.context();
+
+        Ok(id)
+    }
     //insert
+
     //edit
     //delete
 }

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, sqlx::FromRow)]
 pub struct Session {
     pub(in crate::model) id: u64,
     pub(in crate::model) fk_selected_server_id: Option<u64>,
