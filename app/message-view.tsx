@@ -15,6 +15,7 @@ export default function MessageView({ messageArray }: MessageViewProps) {
 				{messageArray.map((message, index) => {
 					return (
 						<li
+							id={`message-${index}`}
 							key={index}
 							className="w-full bg-transparent pl-2 mt-3 break-all overflow-x-clip"
 						>
@@ -24,7 +25,9 @@ export default function MessageView({ messageArray }: MessageViewProps) {
 										{message.topic}
 									</label>
 									<label className="ml-5 text-xs mt-auto inline-flex text-gray40 min-w-fit">
-										{message.timestamp}
+										{new Date(
+											parseInt(message.timestamp) * 1000,
+										).toLocaleString()}
 									</label>
 								</label>
 								<div className="rounded-b-2xl rounded-tr-2xl p-1 bg-gray80 m-0">
