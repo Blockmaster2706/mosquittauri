@@ -15,6 +15,7 @@ export default function MessageView({ messageArray }: MessageViewProps) {
 				{messageArray.map((message, index) => {
 					return (
 						<li
+							id={`message-${index}`}
 							key={index}
 							className="w-full bg-transparent pl-2 mt-3 break-all overflow-x-clip"
 						>

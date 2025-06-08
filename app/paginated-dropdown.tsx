@@ -4,6 +4,7 @@ import { topic } from "./types";
 interface Props {
 	options: topic[];
 	onChange: (selectedOption: topic | null) => void;
+	enabled: boolean;
 	placeholder?: string;
 	itemsPerPage?: number;
 }
@@ -11,6 +12,7 @@ interface Props {
 function PaginatedDropdown({
 	options,
 	onChange,
+	enabled,
 	placeholder = "Topic",
 	itemsPerPage = 6,
 }: Props) {
@@ -113,7 +115,10 @@ function PaginatedDropdown({
 					))}
 				</div>
 
-				{options.length === 0 && <div>No Topics have been added.</div>}
+				{enabled === false && <div>No Server has been selected.</div>}
+				{enabled && options.length === 0 && (
+					<div>No Topics have been added.</div>
+				)}
 
 				{totalPages > 1 && (
 					<div className="flex justify-between items-center px-2 py-1">
