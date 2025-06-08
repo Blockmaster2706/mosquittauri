@@ -27,6 +27,11 @@ export default function Home() {
 			});
 		});
 
+		const mqttConnectUnlisten = listen("mqtt-connect", () => {
+			console.log("MQTT connected");
+			setIsMQTTConnected(true);
+		});
+
 		let unlisten: UnlistenFn | undefined;
 
 		const setupListener = async () => {
@@ -69,6 +74,7 @@ export default function Home() {
 
 		return () => {
 			logUnlisten.then((f) => f());
+			mqttConnectUnlisten.then((f) => f());
 			if (unlisten) {
 				// Check if unlisten is defined
 				unlisten();
