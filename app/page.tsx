@@ -19,12 +19,36 @@ export default function Home() {
 	const [MQTTMessageArray, setMQTTMessageArray] = useState<message[]>([]);
 	const [logMessageArray, setLogMessageArray] = useState<logMessage[]>([]);
 
+	const [autoScrollingDisabled, setAutoScrollingDisabled] = useState(false);
+
+	const [errorCount, setErrorCount] = useState(0);
+	const [warningCount, setWarningCount] = useState(0);
+
 	useEffect(() => {
 		const logUnlisten = listen("log", (event) => {
+			const newMessage = event.payload as logMessage;
+
+			console.log("Log message array updated:", newMessage);
+			if (newMessage?.level.toLowerCase() === "error" && !isLogsPaneActive) {
+				setErrorCount((prevCount) => prevCount + 1);
+			}
+			if (newMessage?.level.toLowerCase() === "warning" && !isLogsPaneActive) {
+				setWarningCount((prevCount) => prevCount + 1);
+			}
+
 			setLogMessageArray((prevMessages: logMessage[]) => {
-				const newMessage = event.payload as logMessage;
 				return [...prevMessages, newMessage];
 			});
+		});
+
+		const mqttConnectUnlisten = listen("mqtt-connect", () => {
+			console.log("MQTT connected");
+			setIsMQTTConnected(true);
+		});
+
+		const mqttDisconnectUnlisten = listen("mqtt-disconnect", () => {
+			console.log("MQTT disconnected");
+			setIsMQTTConnected(false);
 		});
 
 		let unlisten: UnlistenFn | undefined;
@@ -69,12 +93,37 @@ export default function Home() {
 
 		return () => {
 			logUnlisten.then((f) => f());
+			mqttConnectUnlisten.then((f) => f());
+			mqttDisconnectUnlisten.then((f) => f());
 			if (unlisten) {
 				// Check if unlisten is defined
 				unlisten();
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`message-${MQTTMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [MQTTMessageArray]);
+
+	useEffect(() => {
+		if (autoScrollingDisabled) return;
+		const element = document.getElementById(
+			`log-message-${logMessageArray.length - 1}`,
+		);
+		if (element) {
+			element.scrollIntoView({ behavior: "smooth", block: "end" });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [logMessageArray]);
 
 	return (
 		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -114,7 +163,7 @@ export default function Home() {
 					</div>
 
 					<div className="col-start-92 col-span-9 h-full flex flex-col items-center justify-end z-30">
-						<div className="mb-5 -mt-17 h-34 w-12">
+						<div className="mb-5 -mt-17 h-51 w-12">
 							<SecondarySidebar
 								sendButtonEnabled={isMQTTConnected}
 								inputValue={inputValue}
@@ -122,6 +171,12 @@ export default function Home() {
 								setInputValue={setInputValue}
 								isShowingLogs={isLogsPaneActive}
 								setShowingLogs={setLogsPaneActive}
+								autoScrollingDisabled={autoScrollingDisabled}
+								setAutoScrollDisabled={setAutoScrollingDisabled}
+								errorCount={errorCount}
+								setErrorCount={setErrorCount}
+								warningCount={warningCount}
+								setWarningCount={setWarningCount}
 							/>
 						</div>
 					</div>

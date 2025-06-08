@@ -10,7 +10,7 @@ import { Server } from "../types/server";
 import { invoke } from "@tauri-apps/api/core";
 import EditServer from "./edit-server";
 import commands from "../types/commands";
-import { listen } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 
 interface SettingsPageProps {
 	topicList: topic[];
@@ -35,7 +35,6 @@ export default function SettingsPage({
 	topicList,
 	setTopicList,
 	connected,
-	setConnected,
 	address,
 }: SettingsPageProps) {
 	const themes = ["mosquittauri", "flashbang", "UwU"];
@@ -174,26 +173,9 @@ export default function SettingsPage({
 							input_classname={input_classname}
 							onBackClick={() => setMode(Mode.ServerList)}
 							onAddClick={(name: string, url: string, port: number) => {
-								// Convert URL format properly
-								let hostname;
-								try {
-									// Add protocol if missing, so we can extract hostname properly
-									if (
-										!url.startsWith("http://") &&
-										!url.startsWith("https://")
-									) {
-										hostname = new URL(`http://${url}`);
-									} else {
-										hostname = new URL(url);
-									}
-								} catch (e) {
-									// If URL is invalid, just use it as is
-									console.error("Invalid URL:", e);
-								}
-
 								invoke(commands.add_server, {
 									name: name,
-									url: hostname,
+									url: url,
 									port: port,
 									clientId: `mosquittauri-client-${serverList.length}`,
 								});
@@ -252,6 +234,8 @@ export default function SettingsPage({
 								setSelectedServerID(-1);
 								setMode(Mode.ServerList);
 							}}
+							setExternalTopicList={setTopicList}
+							isMqttConnected={connected}
 						/>
 					</div>
 
@@ -278,10 +262,14 @@ export default function SettingsPage({
 				<button
 					title={address === "" ? "Please input a Server Address" : ""}
 					disabled={selectedServerID === -1}
-					onClick={() => invoke(commands.mqtt_connect)}
+					onClick={
+						connected
+							? () => emit("mqtt-disconnect-request")
+							: () => invoke(commands.mqtt_connect)
+					}
 					className={settingsButtonClassname}
 				>
-					Connect
+					{connected ? "Disconnect" : "Connect"}
 				</button>
 			</div>
 		</div>
