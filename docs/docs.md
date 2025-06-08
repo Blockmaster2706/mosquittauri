@@ -26,7 +26,7 @@ Mosquittauri is an Application designed to be a pretty Interface for MQTT Commun
 
 The Diagram below illustrates what the Use Case (or Relationship) between Mosquittauri, it's User, and the MQTT Broker are, including the relationship between Components in MSQT.
 
-#### TODO: USE CASE DIAGRAM
+![Showing how the User and MQTT Broker interact with the MSQT](MSQT_Use_Case_Diagram.drawio.png)
 
 ## 4. Solution Strategy
 
