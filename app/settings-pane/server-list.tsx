@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Server } from "../types/server";
 import { settingsButtonClassname } from "./settings-pane";
-import { emit, listen } from "@tauri-apps/api/event";
+import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import commands from "../types/commands";
 
