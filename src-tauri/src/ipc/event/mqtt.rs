@@ -3,7 +3,13 @@ use tauri::{AppHandle, Emitter};
 
 use crate::model::Message;
 
-#[allow(dead_code)]
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MqttConnectEvent {}
+impl MqttConnectEvent {
+    pub const ID: &str = "mqtt-connect";
+}
+
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MqttDisconnectEvent {}

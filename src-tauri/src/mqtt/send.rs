@@ -18,7 +18,6 @@ impl MqttPool {
         client: Arc<Lock<AsyncClient>>,
         running: Arc<AtomicBool>,
         send_event_receiver: Receiver<MqttSendEvent>,
-        message_batch_sender: Sender<Vec<Message>>,
     ) -> JoinHandle<()> {
         spawn(move || {
             while running.load(Ordering::Relaxed) {
@@ -36,17 +35,6 @@ impl MqttPool {
                             log::warn!("Failed to publish mqtt message: {e:?}");
                             continue;
                         }
-                        // match Message::try_from(msg) {
-                        //     Ok(msg) => {
-                        //         if let Err(e) = message_batch_sender.send(vec![msg]) {
-                        //             log::warn!(
-                        //                 "Failed to send message generated from send event: {e}"
-                        //             )
-                        //         }
-                        //         log::trace!("send copy of sent message to batch listener");
-                        //     }
-                        //     Err(e) => log::warn!("Failed generate message from send event: {e}"),
-                        // }
                     }
                     Err(RecvTimeoutError::Timeout) => continue,
                     Err(RecvTimeoutError::Disconnected) => break,
