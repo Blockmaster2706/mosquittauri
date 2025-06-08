@@ -13,11 +13,13 @@ impl MsqtDao for Message {
 }
 
 impl Message {
-    pub fn try_new(topic: String, payload: String) -> Result<Self> {
+    pub fn try_new(server_id: u64, topic: String, payload: String, outgoing: bool) -> Result<Self> {
         Ok(Self {
             id: STORAGE.get()?.gen_id()?,
+            fk_server_id: server_id,
             topic,
             payload,
+            outgoing,
         })
     }
 }

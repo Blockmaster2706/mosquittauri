@@ -1,10 +1,10 @@
 use anyhow::{Context, Result};
 use chrono::Local;
-use log::{Metadata, Record};
+use log::Record;
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
-use super::MsqtEvent;
+use super::{id, MsqtEvent};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -17,7 +17,7 @@ pub struct LogEvent {
 }
 
 impl MsqtEvent for LogEvent {
-    const ID: &str = "log";
+    const ID: &str = id::LOG;
     fn send(&self, app: &tauri::AppHandle) -> tauri::Result<()> {
         app.emit(Self::ID, self)
             .inspect_err(|e| eprintln!("Failed to send LogEvent: {e}"))

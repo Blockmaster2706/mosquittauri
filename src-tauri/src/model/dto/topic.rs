@@ -1,3 +1,4 @@
+use rumqttc::SubscribeFilter;
 use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
@@ -22,7 +23,13 @@ impl Topic {
     pub fn server_id(&self) -> u64 {
         self.fk_server_id
     }
+    pub fn get_subscribe_filter(&self) -> SubscribeFilter {
+        SubscribeFilter::new(self.name.to_string(), rumqttc::QoS::ExactlyOnce)
+    }
     pub fn name(&self) -> &str {
         &self.name
+    }
+    pub fn is_enabled(&self) -> bool {
+        self.enabled
     }
 }

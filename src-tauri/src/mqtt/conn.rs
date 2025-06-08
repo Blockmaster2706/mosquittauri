@@ -5,12 +5,13 @@ use std::{
         Arc,
     },
     thread::{spawn, JoinHandle},
-    time::Instant,
+    time::{Duration, Instant},
 };
 
 use anyhow::Result;
 use rumqttc::{ConnectionError, Event, EventLoop, Packet, Publish};
 use tauri::async_runtime as tk;
+use tokio::time::timeout;
 
 pub struct MqttConnection {
     handle: JoinHandle<()>,
@@ -29,7 +30,7 @@ impl MqttConnection {
 
     pub fn await_disconnect(self) {
         if let Err(e) = self.handle.join() {
-            log::warn!("Failed to stop thread of mqtt connettion: {e:?}")
+            log::warn!("Failed to stop thread of mqtt connettion: {e:#?}")
         }
     }
 
@@ -39,22 +40,24 @@ impl MqttConnection {
         running: Arc<AtomicBool>,
     ) -> JoinHandle<()> {
         spawn(move || {
-            // let mut check_cycle = 0;
             let mut instant = Instant::now();
             loop {
-                let res = tk::block_on(eventloop.poll());
+                let Ok(res) = tk::block_on(tokio::time::timeout(
+                    Duration::from_secs(6),
+                    eventloop.poll(),
+                )) else {
+                    continue;
+                };
                 Self::parse_event(res, &publish_sender);
-                // check_cycle += 1;
                 if instant.elapsed().as_millis() > 1500 {
-                    // log::debug!("Connection: Check if running");
+                    log::trace!("Connection: Check if running");
                     if !running.load(Ordering::Relaxed) {
-                        return;
+                        break;
                     }
                     instant = Instant::now();
-                    // check_cycle = 0;
                 }
-                // sleep(Duration::from_millis(1500));
             }
+            log::info!("stopped mqtt connection listener");
         })
     }
 
