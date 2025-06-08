@@ -1,0 +1,17 @@
+syntax = "proto3";
+package event.server.v1;
+
+import "model/server/v1/server.proto";
+
+message ServerSelected {
+  uint64 id = 1;
+}
+
+message ServerUpdate {
+  repeated model.server.v1.Server list = 1;
+}
+
+message ServerError {
+  string msg = 1;
+}
+
