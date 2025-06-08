@@ -40,10 +40,6 @@ export default function TopicList({
 					break;
 				}
 			}
-			invoke(commands.set_listen_all_topics, {
-				enabled: allTopicsEnabled,
-				serverId: selected_server_id,
-			});
 
 			setTopicList(newTopicList.list);
 			setExternalTopicList(newTopicList.list);
