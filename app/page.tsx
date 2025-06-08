@@ -32,6 +32,11 @@ export default function Home() {
 			setIsMQTTConnected(true);
 		});
 
+		const mqttDisconnectUnlisten = listen("mqtt-disconnect", () => {
+			console.log("MQTT disconnected");
+			setIsMQTTConnected(false);
+		});
+
 		let unlisten: UnlistenFn | undefined;
 
 		const setupListener = async () => {
@@ -75,6 +80,7 @@ export default function Home() {
 		return () => {
 			logUnlisten.then((f) => f());
 			mqttConnectUnlisten.then((f) => f());
+			mqttDisconnectUnlisten.then((f) => f());
 			if (unlisten) {
 				// Check if unlisten is defined
 				unlisten();
@@ -113,7 +119,7 @@ export default function Home() {
 									inputValue={inputValue}
 									setInputValue={setInputValue}
 									topicList={topicList}
-									enabled={true}
+									enabled={isMQTTConnected}
 								/>
 							</div>
 						</div>
