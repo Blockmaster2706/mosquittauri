@@ -4,7 +4,7 @@ use anyhow::Context;
 use tauri::{AppHandle, Listener};
 
 use crate::{
-    ipc::event::{MqttDisconnectEvent, MqttSendEvent, MqttSyncEvent},
+    ipc::event::{MqttConnectEvent, MqttDisconnectEvent, MqttPullEvent, MqttSendEvent, MsqtEvent},
     model::{MsqtDao, Server, Session, Topic},
     mqtt::MqttPool,
 };
@@ -14,8 +14,8 @@ pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
     let server_id = Session::get_or_init()
         .context("Failed to get session")?
         .server_id()
-        .unwrap();
-    let server = Server::find_by_id(server_id).unwrap();
+        .context("failed to get selected server id")?;
+    let server = Server::find_by_id(server_id).context("Failed to get selected server")?;
     let mut pool = MqttPool::new(server.get_mqtt_options());
     let running = pool.get_running_atomic();
     let running_disconnect = running.clone();
@@ -46,6 +46,7 @@ pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
         }
     }
 
+    MqttConnectEvent::new().send(&app)?;
     let msg_receiver = pool
         .get_msg_receiver()
         .context("msg receiver already taken")?;
@@ -53,7 +54,7 @@ pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
         let Ok(batch) = msg_receiver.recv_timeout(Duration::from_millis(1000)) else {
             continue;
         };
-        if let Err(e) = MqttSyncEvent::new(batch).send(&app) {
+        if let Err(e) = MqttPullEvent::new(batch).send(&app) {
             log::error!("Failed to send mqtt sync event: {e}");
             continue;
         }
