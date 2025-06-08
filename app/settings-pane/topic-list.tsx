@@ -65,7 +65,7 @@ export default function TopicList({
 				}
 			}}
 		>
-			<div className="w-full h-full max-h-[70%] mt-1">
+			<div className="w-full h-full max-h-[90%] mt-1">
 				<label>
 					Current Server:{" "}
 					<label className="text-[var(--accent)]">{serverName}</label>
