@@ -21,6 +21,13 @@ impl MqttConnectEvent {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct MqttDisconnectRequest {}
+impl MsqtEvent for MqttDisconnectRequest {
+    const ID: &str = id::MQTT_DISCONNECT_REQUEST;
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MqttDisconnectEvent {}
 impl MsqtEvent for MqttDisconnectEvent {
     const ID: &str = id::MQTT_DISCONNECT;
@@ -82,7 +89,6 @@ impl MqttPullEvent {
 pub struct MqttError {
     msg: String,
 }
-#[allow(unused)]
 impl MqttError {
     const ID: &str = id::MQTT_ERROR;
     pub fn new(msg: impl ToString) -> Self {
