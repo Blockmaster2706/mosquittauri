@@ -1,11 +1,11 @@
-use rumqttc::{ConnectionError, Event, EventLoop, Packet, Publish};
+use rumqttc::{Event, EventLoop, Packet, Publish};
 use std::{
     sync::{
         atomic::{AtomicBool, Ordering},
         mpsc::{Receiver, Sender},
         Arc,
     },
-    thread::{sleep, spawn, JoinHandle},
+    thread::{spawn, JoinHandle},
     time::{Duration, Instant},
 };
 use tauri::async_runtime as tk;
@@ -21,7 +21,7 @@ impl MqttPool {
         running: Arc<AtomicBool>,
     ) -> JoinHandle<()> {
         spawn(move || {
-            let mut instant = Instant::now();
+            let mut instant_check = Instant::now();
             loop {
                 let event = tk::block_on(eventloop.poll());
 
@@ -41,14 +41,13 @@ impl MqttPool {
                     }
                 }
 
-                sleep(Duration::from_millis(500));
                 // check if disconnect event sent
-                if instant.elapsed().as_millis() > 1500 {
+                if instant_check.elapsed().as_millis() > 1500 {
                     log::trace!("Server listener: Check if running");
                     if !running.load(Ordering::Relaxed) {
                         break;
                     }
-                    instant = Instant::now();
+                    instant_check = Instant::now();
                 }
             }
             log::debug!("stopped mqtt connection listener");
@@ -64,8 +63,8 @@ impl MqttPool {
             while running.load(Ordering::Relaxed) {
                 let start = Instant::now();
                 let mut messages = Vec::new();
-                while start.elapsed().as_millis() < 1500 {
-                    let Ok(publish) = publish_receiver.recv_timeout(Duration::from_millis(1000))
+                while start.elapsed().as_millis() < 1000 {
+                    let Ok(publish) = publish_receiver.recv_timeout(Duration::from_millis(100))
                     else {
                         continue;
                     };

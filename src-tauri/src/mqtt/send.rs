@@ -28,7 +28,7 @@ impl MqttPool {
                             tk::block_on(client.publish(
                                 msg.topic(),
                                 QoS::ExactlyOnce,
-                                false,
+                                true,
                                 msg.payload(),
                             ))
                         }) {
