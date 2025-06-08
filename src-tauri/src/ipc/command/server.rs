@@ -1,12 +1,12 @@
-use tauri::{AppHandle, Url};
+use tauri::AppHandle;
 
 use crate::ipc::event::{ServerError, ServerSelected, ServerUpdate};
-use crate::model::{Server, Session};
+use crate::model::{Server, Session, Topic};
 
 #[tauri::command]
 pub async fn add_server(
     name: String,
-    url: Url,
+    url: String,
     port: u16,
     client_id: String,
     app: AppHandle,
@@ -33,7 +33,7 @@ pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
 pub async fn edit_server(
     id: u64,
     name: String,
-    url: Url,
+    url: String,
     port: u16,
     client_id: String,
     app: AppHandle,
@@ -56,6 +56,7 @@ pub async fn delete_server(id: u64, app: AppHandle) -> tauri::Result<()> {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }
+    Topic::delete_by_server(id)?;
     ServerUpdate::from_all(&app)?.send(&app)?;
     Ok(())
 }

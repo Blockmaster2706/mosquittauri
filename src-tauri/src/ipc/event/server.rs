@@ -3,6 +3,8 @@ use tauri::{AppHandle, Emitter};
 
 use crate::model::{MsqtDao, Server};
 
+use super::id;
+
 // include!("../../../gen/proto/event.server.v1.rs");
 
 #[derive(Clone, Serialize)]
@@ -11,7 +13,7 @@ pub struct ServerUpdate {
     list: Vec<Server>,
 }
 impl ServerUpdate {
-    const ID: &str = "server-update";
+    const ID: &str = id::SERVER_UPDATE;
     pub fn from_all(app: &AppHandle) -> tauri::Result<Self> {
         let list = match Server::find_all() {
             Ok(list) => list,
@@ -36,7 +38,7 @@ pub struct ServerSelected {
     id: u64,
 }
 impl ServerSelected {
-    const ID: &str = "server-selected";
+    const ID: &str = id::SERVER_SELECTED;
     pub fn new(id: u64) -> Self {
         Self { id }
     }
@@ -53,7 +55,7 @@ pub struct ServerError {
     msg: String,
 }
 impl ServerError {
-    const ID: &str = "server-error";
+    const ID: &str = id::SERVER_ERROR;
     pub fn new(msg: impl ToString) -> Self {
         Self {
             msg: msg.to_string(),

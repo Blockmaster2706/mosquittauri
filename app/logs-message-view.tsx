@@ -1,7 +1,4 @@
-import { listen } from "@tauri-apps/api/event";
-import { useEffect, useState } from "react";
-
-export type message = {
+export type logMessage = {
 	level: "info" | "warning" | "error" | "debug" | "trace";
 	module?: string;
 	target: string;
@@ -10,27 +7,10 @@ export type message = {
 };
 
 export interface MessageViewProps {
-	messageArray: message[];
+	messageArray: logMessage[];
 }
 
-export default function LogsMessageView() {
-	const [messageArray, setMessageArray] = useState<message[]>([]);
-
-	useEffect(() => {
-		const unlisten = listen("log", (event) => {
-			console.log("Received log event:", event);
-			setMessageArray((prevMessages: message[]) => {
-				const newMessage = event.payload as message;
-				return [...prevMessages, newMessage];
-			});
-			console.log("Received log event:", event);
-		});
-
-		return () => {
-			unlisten.then((f) => f());
-		};
-	}, []);
-
+export default function LogsMessageView({ messageArray }: MessageViewProps) {
 	return (
 		<div className="w-full h-full mt-5">
 			<ul>
@@ -49,6 +29,7 @@ export default function LogsMessageView() {
 					})();
 					return (
 						<li
+							id={`log-message-${index}`}
 							key={index}
 							className="w-full bg-transparent pl-2 mt-3 break-words overflow-x-clip"
 						>

@@ -11,6 +11,7 @@ pub struct Session {
     pub(in crate::model) connected: bool,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Session {
     fn default() -> Self {
         Self {
