@@ -281,7 +281,7 @@ export default function SettingsPage({
 					disabled={selectedServerID === -1}
 					onClick={
 						connected
-							? () => emit("mqtt-disconnect")
+							? () => emit("mqtt-disconnect-request")
 							: () => invoke(commands.mqtt_connect)
 					}
 					className={settingsButtonClassname}
