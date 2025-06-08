@@ -65,7 +65,7 @@ The following Diagram illustrates the classes and methods of the MQTT Part of th
 
 The following Diagram shows the Process of how MSQT communicates with the MQTT Broker.
 
-#### TODO: SEQUENCE DIAGRAM
+![Showing how MQTT Communication works in MSQT](sequence.svg)
 
 ## 7. Deployment View
 
