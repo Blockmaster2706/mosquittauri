@@ -100,3 +100,57 @@ export function SendIcon(props: React.SVGProps<SVGSVGElement>) {
 		</svg>
 	);
 }
+
+export function AutoScrollIcon(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			height={40}
+			fill="currentcolor"
+			width={40}
+			version="1.1"
+			id="Layer_1"
+			{...props}
+			viewBox="4 4 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d="m12 16a4 4 0 1 0 4-4 4 4 0 0 0 -4 4zm6 0a2 2 0 1 1 -2-2 2 2 0 0 1 2 2z" />
+			<path d="m16 27.17-5.6-5.59-1.4 1.42 7 7 7-7-1.41-1.41z" />
+			<path d="m16 4.83 5.58 5.57 1.42-1.4-7-7-7 7 1.41 1.41z" />
+			<path d="m0 0h32v32h-32z" fill="none" />
+		</svg>
+	);
+}
+
+export function ManualScrollIcon(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			height={40}
+			fill="currentcolor"
+			width={40}
+			version="1.1"
+			id="Layer_1"
+			{...props}
+			viewBox="0 0 32 32"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d="m12 16a4 4 0 1 0 4-4 4 4 0 0 0 -4 4zm6 0a2 2 0 1 1 -2-2 2 2 0 0 1 2 2z" />
+			<path d="m0 0h32v32h-32z" fill="none" />
+		</svg>
+	);
+}
+
+export function EditIcon(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			height={40}
+			viewBox="0 0 8 8"
+			width={40}
+			fill="currentcolor"
+			role="img"
+			{...props}
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d="m6 0-1 1 2 2 1-1zm-2 2-4 4v2h2l4-4z" />
+		</svg>
+	);
+}
