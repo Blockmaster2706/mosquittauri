@@ -252,6 +252,7 @@ export default function SettingsPage({
 								setSelectedServerID(-1);
 								setMode(Mode.ServerList);
 							}}
+							setExternalTopicList={setTopicList}
 						/>
 					</div>
 

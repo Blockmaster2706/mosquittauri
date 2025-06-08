@@ -15,6 +15,11 @@ interface PublishBarProps {
 	setTopic: Dispatch<SetStateAction<topic | null>>;
 }
 
+type MQTTPayload = {
+	topic: string;
+	payload: string;
+};
+
 export const handleSubmit = (
 	inputValue: string,
 	topic: topic | null,
@@ -22,12 +27,8 @@ export const handleSubmit = (
 ) => {
 	// Process the input value
 	const now = new Date();
-	emit<message>("newMessage", {
-		timestamp: now.toLocaleTimeString([], {
-			hour: "2-digit",
-			minute: "2-digit",
-		}),
-		message: inputValue,
+	emit<MQTTPayload>("mqtt-send", {
+		payload: inputValue,
 		topic: topic?.name ?? "",
 	});
 	setInputValue(""); // Clear the input after submitting
@@ -77,6 +78,7 @@ export default function PublishBar({
 				onChange={(topic) => {
 					setTopic(topic);
 				}}
+				enabled={enabled}
 			></PaginatedDropdown>
 		</div>
 	);
