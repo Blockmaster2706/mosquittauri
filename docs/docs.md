@@ -50,7 +50,25 @@ Tauri is used to bundle the application into a lightweight, cross-platform deskt
 
 Originally developed as a temporary solution until the SQL Integration exists, the JSON Storage provides a simple way to store Settings for the Application. It utilizes multiple JSON Files, that will be generated in the Folder where the MSQT is executed.
 
-### 4.5 SQL Database
+### 4.5 SQLite Database
+
+#### TODO: SQL DOKUMENTIEREN
+
+### 5, Building Block View
+
+#### TODO: CLASS DIAGRAM
+
+### 6. Runtime View
+
+#### 6.1 MQTT Communication
+
+The following Diagram shows the Process of how MSQT communicates with the MQTT Broker.
+
+#### TODO: SEQUENCE DIAGRAM
+
+## 7. Deployment View
+
+We use a Github Actions Pipeline to automatically build the Application for multiple Platforms, including Windows, Linux and MacOS. This ensures consistent and reproducible builds, as well as giving us multiple "snapshots" of how the Program behaved throughout versions.
 
 ## 12. Glossary
 
