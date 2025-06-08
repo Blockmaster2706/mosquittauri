@@ -47,3 +47,22 @@ impl TopicError {
         }
     }
 }
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TopicStateEvent {
+    id: u64,
+}
+
+impl MsqtEvent for TopicStateEvent {
+    const ID: &str = id::TOPIC_STATE;
+}
+
+impl TopicStateEvent {
+    pub fn new(id: u64) -> Self {
+        Self { id }
+    }
+    pub fn id(&self) -> u64 {
+        self.id
+    }
+}

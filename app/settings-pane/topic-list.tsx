@@ -23,7 +23,9 @@ export default function TopicList({
 	setExternalTopicList,
 	isMqttConnected,
 }: TopicListProps) {
-	const [topicList, setTopicList] = useState<topic[]>([]);
+	const [topicList, setTopicList] = useState<topic[]>([
+		{ id: 0, name: "placeholder", enabled: false },
+	]);
 
 	useEffect(() => {
 		const unlisten = listen("topic-update", (event) => {
@@ -32,7 +34,7 @@ export default function TopicList({
 			const newTopicList = updatedTopicList as { list: topic[] };
 			console.log("New topic list:", newTopicList);
 
-			setTopicList(newTopicList.list);
+			setTopicList(newTopicList.list ?? []);
 			setExternalTopicList(newTopicList.list);
 		});
 
