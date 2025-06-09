@@ -13,6 +13,9 @@ impl MsqtDao for Session {
     /*
      * SELECT * FROM Session;
      */
+    async fn find_by_id(id: u32) -> Result<Self> {
+        todo!()
+    }
 }
 
 impl Session {

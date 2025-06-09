@@ -16,6 +16,9 @@ impl MsqtDao for Topic {
             .context("Failed to get full server list")
     }
     // SELECT * FROM Topic;
+    async fn find_by_id(id: u32) -> Result<Self> {
+        todo!()
+    }
 }
 
 impl Topic {

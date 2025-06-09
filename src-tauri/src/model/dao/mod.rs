@@ -19,11 +19,5 @@ pub trait MsqtDao: Sized + MsqtDto {
             .context(format!("failed to update {}", type_name::<Self>()))?;
         Ok(self)
     }
-    async fn find_by_id(id: u32) -> Result<Self> {
-        Self::find_all()
-            .await?
-            .into_iter()
-            .find(|d| d.id() == id)
-            .context(format!("No item with id {id}"))
-    }
+    async fn find_by_id(id: u32) -> Result<Self>;
 }
