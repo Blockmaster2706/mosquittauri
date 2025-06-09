@@ -1,28 +1,31 @@
 -- Add migration script here
-CREATE TABLE Server (
-	id INTEGER PRIMARY KEY NOT NULL,
-	name TEXT,
-	url TEXT,
-	port INTEGER,
-	client_id TEXT
+CREATE TABLE IF NOT EXISTS Server (
+	id INTEGER NOT NULL PRIMARY KEY,
+	name TEXT NOT NULL,
+	url TEXT NOT NULL,
+	port INTEGER NOT NULL,
+	client_id TEXT NOT NULL
 );
 
-CREATE TABLE Message (
-	id INTEGER PRIMARY KEY NOT NULL,
-	topic TEXT,
-	payload TEXT
+CREATE TABLE IF NOT EXISTS Message (
+	id INTEGER NOT NULL PRIMARY KEY,
+	topic TEXT NOT NULL,
+	payload TEXT NOT NULL
 );
 
-CREATE TABLE Topic (
-	id INTEGER PRIMARY KEY NOT NULL,
-	FOREIGN KEY(fk_server_id) REFERENCES Server(id) NOT NULL,
-	name TEXT,
-	enabled BOOLEAN
+CREATE TABLE IF NOT EXISTS Topic (
+	id INTEGER NOT NULL PRIMARY KEY,
+	fk_server_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	enabled BOOLEAN NOT NULL,
+	FOREIGN KEY(fk_server_id) REFERENCES Server(id)
 );
 
-CREATE TABLE Session (
-	id INTEGER PRIMARY KEY NOT NULL,
-	FOREIGN KEY(fk_selected_server_id) REFERENCES Server(id) NOT NULL,
-	all_topics BOOLEAN,
-	connected BOOLEAN
+CREATE TABLE IF NOT EXISTS Session (
+	id INTEGER NOT NULL PRIMARY KEY,
+	fk_selected_server_id INTEGER, 
+	all_topics BOOLEAN NOT NULL,
+	connected BOOLEAN NOT NULL,
+	FOREIGN KEY(fk_selected_server_id) REFERENCES Server(id)
 );
+
