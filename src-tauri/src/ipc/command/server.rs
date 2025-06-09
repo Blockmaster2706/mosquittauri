@@ -21,7 +21,7 @@ pub async fn add_server(
 
 #[tauri::command]
 pub async fn select_server(id: u32, app: AppHandle) -> tauri::Result<()> {
-    if let Err(e) = Session::select_server(id) {
+    if let Err(e) = Session::select_server(id).await {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }
@@ -53,7 +53,7 @@ pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
 
 #[tauri::command]
 pub async fn delete_server(id: u32, app: AppHandle) -> tauri::Result<()> {
-    if let Err(e) = Server::delete(id) {
+    if let Err(e) = Server::delete(id).await {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }

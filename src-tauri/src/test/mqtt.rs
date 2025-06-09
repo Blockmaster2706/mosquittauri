@@ -37,15 +37,22 @@ impl TestContext for MqttTest {
             ))
             .expect("Failed to create test server"),
         };
-        Session::select_server(server.id()).expect("Failed to select error");
-        let topic = Topic::try_new(server.id(), "msqt_test").expect("Failed to create test topic");
-        Topic::set_enabled(topic.id(), true).expect("Failed to enable test topic");
+        block_on(Session::select_server(server.id())).expect("Failed to select error");
+        let topic = block_on(Topic::try_new(server.id(), "msqt_test"))
+            .expect("Failed to create test topic");
+        block_on(Topic::set_enabled(topic.id(), true)).expect("Failed to enable test topic");
         let topic = block_on(topic.update()).unwrap();
         Self { server, topic }
     }
     fn teardown(self) {
-        Server::delete(self.server.id()).expect("Failed to delte mqtt test server");
-        Topic::delete(self.topic.id()).expect("Failed to delete test topic")
+        block_on(async {
+            Server::delete(self.server.id())
+                .await
+                .expect("Failed to delte mqtt test server");
+            Topic::delete(self.topic.id())
+                .await
+                .expect("Failed to delete test topic")
+        })
     }
 }
 

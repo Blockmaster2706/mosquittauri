@@ -19,7 +19,7 @@ impl MsqtDao for Topic {
 }
 
 impl Topic {
-    pub fn try_new(server_id: u32, name: impl Into<String>) -> Result<Self> {
+    pub async fn try_new(server_id: u32, name: impl Into<String>) -> Result<Self> {
         let name = name.into();
         log::info!("adding topic {name}");
         let topic = Self {
@@ -36,7 +36,7 @@ impl Topic {
      * VALUES ({get_id()}, {server_id}, {name}, 0);
      */
 
-    pub fn update(id: u32, name: impl Into<String>) -> Result<()> {
+    pub async fn update(id: u32, name: impl Into<String>) -> Result<()> {
         let name = name.into();
         log::info!("updating topic {name}");
         STORAGE.get_mut()?.edit(id, |topic| topic.name = name)
@@ -47,7 +47,7 @@ impl Topic {
      * WHERE id = {id};
      */
 
-    pub fn set_enabled(topic_id: u32, enabled: bool) -> Result<()> {
+    pub async fn set_enabled(topic_id: u32, enabled: bool) -> Result<()> {
         STORAGE.get_mut()?.edit(topic_id, |topic| {
             log::info!("setting topic {} state to {}", topic.name, enabled);
             topic.enabled = enabled
@@ -117,7 +117,7 @@ impl Topic {
      * WHERE fk_server_id = {server_id};
      */
 
-    pub fn delete(id: u32) -> Result<()> {
+    pub async fn delete(id: u32) -> Result<()> {
         log::info!("deleting topic with id {id}");
         STORAGE.get_mut()?.delete(id)
     }

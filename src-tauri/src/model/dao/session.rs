@@ -28,7 +28,7 @@ impl Session {
      * SELECT
      * INSERT INTO Session (id, fk_server_id, name, )
      */
-    pub fn select_server(server_id: u32) -> Result<()> {
+    pub async fn select_server(server_id: u32) -> Result<()> {
         STORAGE
             .get_mut()?
             .update(|list| {
@@ -43,7 +43,7 @@ impl Session {
      * WHERE id = {id};
      */
 
-    pub fn set_listen_all_topics(enabled: bool) -> Result<()> {
+    pub async fn set_listen_all_topics(enabled: bool) -> Result<()> {
         STORAGE
             .get_mut()?
             .edit(0, |session| session.listen_all_topics = enabled)
