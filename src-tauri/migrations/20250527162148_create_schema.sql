@@ -3,6 +3,7 @@ CREATE TABLE Server (
 	id INTEGER PRIMARY KEY NOT NULL,
 	name TEXT,
 	url TEXT,
+	port INTEGER,
 	client_id TEXT
 );
 

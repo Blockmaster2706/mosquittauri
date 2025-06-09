@@ -9,8 +9,9 @@ use rumqttc::{AsyncClient, QoS};
 use tauri::async_runtime as tk;
 
 use crate::ipc::event::MqttSendEvent;
+use crate::utils::Lock;
 
-use super::{lock::Lock, MqttPool};
+use super::MqttPool;
 
 impl MqttPool {
     pub(super) fn start_msg_sender(

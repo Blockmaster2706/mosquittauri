@@ -30,7 +30,7 @@ rumqttc = { version = "0.24.0", default-features = false, features = [
   "proxy",
   "websocket",
 ] }
-sqlx = { version = "0.8.5", features = ["runtime-tokio", "tls-native-tls", "sqlite"] }
+sqlx = { version = "0.8.5", features = ["runtime-tokio", "tls-native-tls", "sqlite", "macros"] }
 anyhow = "1.0.98"
 chrono = { version = "0.4.41", features = ["serde"] }
 prost = { version = "0.13.5", features = ["derive"] }
