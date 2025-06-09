@@ -28,8 +28,8 @@ impl MsqtDao for Server {
         let pool = POOL.get().await;
         let servers = query!(
             r#"
-SELECT id, name, url, port, client_id
-FROM Server
+        SELECT *
+        FROM Server
             "#,
         )
         .fetch_all(&*pool)
@@ -39,9 +39,6 @@ FROM Server
         .collect();
         Ok(servers)
     }
-    /*
-     * SELECT * FROM Server;
-     */
 }
 
 impl Server {
@@ -61,7 +58,7 @@ impl Server {
         INSERT INTO Server (name, url, port, client_id)
         VALUES (?, ?, ?, ?)
         RETURNING *;
-                "#,
+            "#,
             name,
             url,
             port,
