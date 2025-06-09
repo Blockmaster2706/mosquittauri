@@ -40,7 +40,21 @@ impl MsqtDao for Server {
         Ok(servers)
     }
     async fn find_by_id(id: u32) -> Result<Self> {
-        todo!()
+        log::info!("find server by id");
+        let pool = POOL.get().await;
+        let servers = query!(
+            r#"
+            SELECT *
+            FROM Server
+            WHERE id = ?
+            "#,
+            id
+        )
+        .fetch_optional(&*pool)
+        .await?
+        .map(|record| server_from_record!(record))
+        .context(format!("Unable to retrieve Server by id: {}", id))?;
+        Ok(servers)
     }
 }
 
