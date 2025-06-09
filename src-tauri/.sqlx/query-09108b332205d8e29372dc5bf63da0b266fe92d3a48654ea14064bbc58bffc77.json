@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, name, url, port, client_id\n            FROM Server\n            WHERE rowid = ?",
+  "query": "\n            SELECT *\n            FROM Server\n            ",
   "describe": {
     "columns": [
       {
@@ -30,7 +30,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 0
     },
     "nullable": [
       false,
@@ -40,5 +40,5 @@
       false
     ]
   },
-  "hash": "23027f47040fd44310838b5999d7be2fe51d0f1813c98fa514a3359038e5c4b3"
+  "hash": "09108b332205d8e29372dc5bf63da0b266fe92d3a48654ea14064bbc58bffc77"
 }
