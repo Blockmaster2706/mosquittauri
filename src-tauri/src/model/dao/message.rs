@@ -11,6 +11,9 @@ impl MsqtDao for Message {
     async fn find_all() -> Result<Vec<Self>> {
         STORAGE.get()?.find_all()
     }
+    async fn find_by_id(id: u32) -> Result<Self> {
+        todo!()
+    }
     /*
      * SELECT * FROM Messages;
      */

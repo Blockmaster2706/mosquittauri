@@ -39,6 +39,9 @@ impl MsqtDao for Server {
         .collect();
         Ok(servers)
     }
+    async fn find_by_id(id: u32) -> Result<Self> {
+        todo!()
+    }
 }
 
 impl Server {
