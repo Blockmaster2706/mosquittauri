@@ -28,8 +28,8 @@ impl MsqtDao for Server {
         let pool = POOL.get().await;
         let servers = query!(
             r#"
-        SELECT *
-        FROM Server
+            SELECT *
+            FROM Server
             "#,
         )
         .fetch_all(&*pool)
@@ -55,9 +55,9 @@ impl Server {
         log::info!("adding server {name}");
         let record = query!(
             r#"
-        INSERT INTO Server (name, url, port, client_id)
-        VALUES (?, ?, ?, ?)
-        RETURNING *;
+            INSERT INTO Server (name, url, port, client_id)
+            VALUES (?, ?, ?, ?)
+            RETURNING *;
             "#,
             name,
             url,
@@ -71,12 +71,17 @@ impl Server {
 
     pub async fn delete(id: u32) -> Result<()> {
         log::info!("deleting server with id {id}");
-        STORAGE.get_mut()?.delete(id)?;
+        let pool = POOL.get().await;
+        query!(
+            r#"
+            DELETE FROM Server WHERE id = ?;
+            "#,
+            id
+        )
+        .execute(&*pool)
+        .await?;
         Ok(())
     }
-    /*
-     * DELETE FROM Sever WHERE id = {id};
-     */
 
     pub async fn update(
         id: u32,

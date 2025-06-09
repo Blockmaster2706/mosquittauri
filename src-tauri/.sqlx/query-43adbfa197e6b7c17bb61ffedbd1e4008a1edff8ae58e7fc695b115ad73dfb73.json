@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\nSELECT * FROM Server\n            ",
+  "query": "\n            INSERT INTO Server (name, url, port, client_id)\n            VALUES (?, ?, ?, ?)\n            RETURNING *;\n            ",
   "describe": {
     "columns": [
       {
@@ -30,7 +30,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 4
     },
     "nullable": [
       false,
@@ -40,5 +40,5 @@
       false
     ]
   },
-  "hash": "a637c02d78ac7265174ed8b0eb07c6d615e1cdb9e3aae87b7091f7e8e4db8a6b"
+  "hash": "43adbfa197e6b7c17bb61ffedbd1e4008a1edff8ae58e7fc695b115ad73dfb73"
 }
