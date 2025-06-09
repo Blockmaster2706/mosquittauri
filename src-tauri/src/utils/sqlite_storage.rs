@@ -1,43 +1,58 @@
-//use anyhow::anyhow;
+use std::sync::{Arc, OnceLock};
+
 use sqlx::{
     migrate::{MigrateDatabase, Migrator},
     sqlite::SqlitePoolOptions,
-    Pool,
-    Sqlite, //query_as
+    Pool, Sqlite,
 };
 
 use anyhow::{Context, Result};
 
-const DB_URL: &str = "sqlite://msqt.sqlite";
+pub type Db = Arc<Pool<Sqlite>>;
+
+pub const DATABASE_URL: &str = "sqlite://msqt.sqlite";
+
+static MIGRATOR: Migrator = sqlx::migrate!();
+pub static POOL: DbOnce = DbOnce::new();
+
+pub struct DbOnce {
+    pool: OnceLock<Db>,
+}
+impl DbOnce {
+    pub const fn new() -> Self {
+        Self {
+            pool: OnceLock::new(),
+        }
+    }
+    pub async fn get(&self) -> Db {
+        if let Some(db) = self.pool.get() {
+            return db.clone();
+        }
+        let db = provision_db().await.expect("Failed to provision db");
+        self.pool.get_or_init(|| db).clone()
+    }
+}
 
 //Provision and/or connect to Database
-pub async fn provision_db() -> Result<()> {
-    if !Sqlite::database_exists(DB_URL)
+pub async fn provision_db() -> Result<Db> {
+    if !Sqlite::database_exists(DATABASE_URL)
         .await
         .context("Failed to check if db exists")?
     {
-        sqlx::Sqlite::create_database(DB_URL)
+        Sqlite::create_database(DATABASE_URL)
             .await
             .context("Failed to create DB")?;
     }
 
-    let crate_dir =
-        std::env::var("CARGO_MANIFEST_DIR").context("Failed to get cargo manifest dir")?;
-    let migrations = std::path::Path::new(&crate_dir).join("./migrations");
-
-    let pool = connect_db().await?;
-    let migrator = Migrator::new(migrations)
+    let pool = SqlitePoolOptions::new()
+        .connect(DATABASE_URL)
         .await
-        .context("Failed to create migrator ")?;
-    migrator.run(&pool).await?;
-    Ok(())
-}
-
-pub async fn connect_db() -> Result<Pool<Sqlite>> {
-    SqlitePoolOptions::new()
-        .connect(DB_URL)
+        .context("Failed to connect with DB")?;
+    MIGRATOR
+        .run(&pool)
         .await
-        .context("Failed to connect with DB")
+        .context("Failed to run migrations")?;
+    Ok(Arc::new(pool))
 }
 
 // Methods for Datatypes
@@ -64,11 +79,11 @@ impl<T: MsqtDto> SqliteStorage<T> {
         }
     }
     //gen_id
-    pub async fn gen_id(&self) -> Result<u64> {
+    pub async fn gen_id(&self) -> Result<u32> {
         Ok(Self::gen_id_from_data(&self.find_all()?))//redundant?
     }
     //gen_id_from_data
-    pub async fn gen_id_from_data(data: &[T]) -> u64 {
+    pub async fn gen_id_from_data(data: &[T]) -> u32 {
         let id = query!(r#SELECT MAX(id) + 1 FROM $1#r, data).await.context();
 
         Ok(id)

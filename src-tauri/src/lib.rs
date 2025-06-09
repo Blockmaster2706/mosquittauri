@@ -9,14 +9,13 @@ use std::{
 
 use anyhow::{Context, Result};
 use chrono::Local;
-
 use ipc::{
     command,
     event::{LogEvent, MsqtEvent},
 };
 use log::LevelFilter;
 use model::Session;
-use tauri::AppHandle;
+use tauri::{async_runtime::block_on, AppHandle};
 use tauri_plugin_log::{
     fern::{log_file, Dispatch, Output},
     Target, TargetKind,
@@ -57,7 +56,6 @@ pub fn run() -> Result<()> {
             command::mqtt_connect,
         ])
         .setup(|app| {
-            Session::get_or_init().context("Failed to init session")?;
             let sender = start_log_event_listener(app.handle().clone());
             let handle = app.handle();
             handle.plugin(
@@ -95,6 +93,7 @@ pub fn run() -> Result<()> {
                     )))
                     .build(),
             )?;
+            block_on(Session::get_or_init()).context("Failed to init session")?;
             Ok(())
         })
         .run(tauri::generate_context!())

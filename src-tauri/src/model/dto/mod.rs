@@ -6,5 +6,5 @@ pub mod session;
 pub mod topic;
 
 pub trait MsqtDto: DeserializeOwned + Serialize {
-    fn id(&self) -> u64;
+    fn id(&self) -> u32;
 }

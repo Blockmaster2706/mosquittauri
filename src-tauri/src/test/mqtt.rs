@@ -27,15 +27,20 @@ impl TestContext for MqttTest {
         let broker_url =
             std::env::var("MSQT_TEST_BROKER_URL").unwrap_or(String::from("test.mosquitto.org"));
         log::debug!("testing with broker {}", broker_url);
-        let server = match Server::find_by_name("msqt_test") {
+        let server = match block_on(Server::find_by_name("msqt_test")) {
             Ok(server) => server,
-            Err(_) => Server::try_new("msqt_test", broker_url, 1883_u16, "mosquitto_test")
-                .expect("Failed to create test server"),
+            Err(_) => block_on(Server::try_new(
+                "msqt_test",
+                broker_url,
+                1883_u16,
+                "mosquitto_test",
+            ))
+            .expect("Failed to create test server"),
         };
         Session::select_server(server.id()).expect("Failed to select error");
         let topic = Topic::try_new(server.id(), "msqt_test").expect("Failed to create test topic");
         Topic::set_enabled(topic.id(), true).expect("Failed to enable test topic");
-        let topic = topic.update().unwrap();
+        let topic = block_on(topic.update()).unwrap();
         Self { server, topic }
     }
     fn teardown(self) {

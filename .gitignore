@@ -43,6 +43,7 @@ next-env.d.ts
 #mosquittauri data / logs
 msqt_data
 msqt_log*
+*.sqlite*
 
 # editors
 .zed

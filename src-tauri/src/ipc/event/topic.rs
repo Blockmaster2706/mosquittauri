@@ -17,8 +17,8 @@ impl MsqtEvent for TopicUpdate {
     const ID: &str = id::TOPIC_UPDATE;
 }
 impl TopicUpdate {
-    pub fn from_all(app: &AppHandle) -> tauri::Result<Self> {
-        let list = match Topic::find_by_selected_server() {
+    pub async fn from_all(app: &AppHandle) -> tauri::Result<Self> {
+        let list = match Topic::find_by_selected_server().await {
             Ok(list) => list,
             Err(e) => {
                 log::error!("Failed to get all topics {e}");
@@ -51,7 +51,7 @@ impl TopicError {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopicStateEvent {
-    id: u64,
+    id: u32,
 }
 
 impl MsqtEvent for TopicStateEvent {
@@ -59,10 +59,10 @@ impl MsqtEvent for TopicStateEvent {
 }
 
 impl TopicStateEvent {
-    pub fn new(id: u64) -> Self {
+    pub fn new(id: u32) -> Self {
         Self { id }
     }
-    pub fn id(&self) -> u64 {
+    pub fn id(&self) -> u32 {
         self.id
     }
 }
