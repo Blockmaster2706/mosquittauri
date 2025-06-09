@@ -13,7 +13,7 @@ pub trait MsqtDao: Sized + MsqtDto {
     async fn find_all() -> Result<Vec<Self>>;
     #[allow(dead_code)]
     /// get latest version of object from database
-    async fn update(mut self) -> Result<Self> {
+    fn refresh(mut self) -> Result<Self> {
         self = Self::find_by_id(self.id())
             .await
             .context(format!("failed to update {}", type_name::<Self>()))?;

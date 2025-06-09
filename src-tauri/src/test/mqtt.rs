@@ -41,7 +41,7 @@ impl TestContext for MqttTest {
         let topic = block_on(Topic::try_new(server.id(), "msqt_test"))
             .expect("Failed to create test topic");
         block_on(Topic::set_enabled(topic.id(), true)).expect("Failed to enable test topic");
-        let topic = block_on(topic.update()).unwrap();
+        let topic = block_on(topic.refresh()).unwrap();
         Self { server, topic }
     }
     fn teardown(self) {
