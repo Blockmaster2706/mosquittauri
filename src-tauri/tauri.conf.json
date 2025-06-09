@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "mosquittauri",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "identifier": "com.mosquittauri.dev",
   "build": {
     "frontendDist": "../out",
@@ -22,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self'"
+      "csp": null
     }
   },
   "bundle": {
