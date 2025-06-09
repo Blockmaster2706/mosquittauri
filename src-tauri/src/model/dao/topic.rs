@@ -105,18 +105,6 @@ impl Topic {
             .map(Some)
     }
 
-    pub fn delete_by_server(server_id: u32) -> Result<()> {
-        STORAGE.get_mut()?.update(|topics| {
-            topics.retain(|topic| topic.server_id() != server_id);
-            Ok(())
-        })?;
-        todo!()
-    }
-    /*
-     * DELETE FROM Topic
-     * WHERE fk_server_id = {server_id};
-     */
-
     pub async fn delete(id: u32) -> Result<()> {
         log::info!("deleting topic with id {id}");
         STORAGE.get_mut()?.delete(id)
