@@ -69,7 +69,7 @@ impl Server {
         Ok(server_from_record!(record))
     }
 
-    pub fn delete(id: u32) -> Result<()> {
+    pub async fn delete(id: u32) -> Result<()> {
         log::info!("deleting server with id {id}");
         STORAGE.get_mut()?.delete(id)?;
         Ok(())
