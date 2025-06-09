@@ -10,7 +10,7 @@ fn print_servers() {
 }
 
 #[test]
-fn test_database() -> Result<()> {
+fn test_storage() -> Result<()> {
     print_servers();
     let server = block_on(Server::try_new(
         "example",
@@ -21,6 +21,6 @@ fn test_database() -> Result<()> {
     .context("Failed to add server")?;
     print_servers();
     sleep(Duration::from_secs(3));
-    Server::delete(server.id())?;
+    block_on(Server::delete(server.id()))?;
     Ok(())
 }
