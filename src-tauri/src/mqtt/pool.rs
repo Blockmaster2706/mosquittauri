@@ -11,10 +11,10 @@ use std::{
 use rumqttc::{AsyncClient, MqttOptions, SubscribeFilter};
 use tauri::async_runtime as tk;
 
-use super::lock::Lock;
 use crate::{
     ipc::event::MqttSendEvent,
     model::{Message, Topic},
+    utils::Lock,
 };
 
 #[allow(dead_code)]

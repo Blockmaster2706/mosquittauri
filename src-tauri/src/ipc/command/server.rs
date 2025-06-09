@@ -11,16 +11,16 @@ pub async fn add_server(
     client_id: String,
     app: AppHandle,
 ) -> tauri::Result<()> {
-    if let Err(e) = Server::try_new(name, url, port, client_id) {
+    if let Err(e) = Server::try_new(name, url, port, client_id).await {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }
-    ServerUpdate::from_all(&app)?.send(&app)?;
+    ServerUpdate::from_all(&app).await?.send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
-pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
+pub async fn select_server(id: u32, app: AppHandle) -> tauri::Result<()> {
     if let Err(e) = Session::select_server(id) {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
@@ -31,7 +31,7 @@ pub async fn select_server(id: u64, app: AppHandle) -> tauri::Result<()> {
 
 #[tauri::command]
 pub async fn edit_server(
-    id: u64,
+    id: u32,
     name: String,
     url: String,
     port: u16,
@@ -39,24 +39,25 @@ pub async fn edit_server(
     app: AppHandle,
 ) -> tauri::Result<()> {
     Server::update(id, name, url, port, client_id)
+        .await
         .inspect_err(|e| log::error!("Failed to create server: {e}"))?;
-    ServerUpdate::from_all(&app)?.send(&app)?;
+    ServerUpdate::from_all(&app).await?.send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn get_servers(app: AppHandle) -> tauri::Result<()> {
-    ServerUpdate::from_all(&app)?.send(&app)?;
+    ServerUpdate::from_all(&app).await?.send(&app)?;
     Ok(())
 }
 
 #[tauri::command]
-pub async fn delete_server(id: u64, app: AppHandle) -> tauri::Result<()> {
+pub async fn delete_server(id: u32, app: AppHandle) -> tauri::Result<()> {
     if let Err(e) = Server::delete(id) {
         log::error!("Failed to create server: {e}");
         ServerError::new(&e).send(&app);
     }
     Topic::delete_by_server(id)?;
-    ServerUpdate::from_all(&app)?.send(&app)?;
+    ServerUpdate::from_all(&app).await?.send(&app)?;
     Ok(())
 }

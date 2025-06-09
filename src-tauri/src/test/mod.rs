@@ -1,5 +1,6 @@
 use chrono::Local;
 use log::LevelFilter;
+use tauri::async_runtime::block_on;
 use tauri_plugin_log::fern::{log_file, Dispatch};
 
 use crate::model::Session;
@@ -22,8 +23,8 @@ pub fn init() {
             ))
         })
         .chain(std::io::stderr())
-        .chain(log_file("msqt_test.log").expect("Failed to init test log file"))
+        .chain(log_file("msqt_log_test.log").expect("Failed to init test log file"))
         .apply()
         .expect("Failed to init logger");
-    Session::get_or_init().expect("Failed to init session");
+    block_on(Session::get_or_init()).expect("Failed to init session");
 }
