@@ -1,4 +1,3 @@
--- Add migration script here
 CREATE TABLE IF NOT EXISTS Server (
 	id INTEGER NOT NULL PRIMARY KEY,
 	name TEXT NOT NULL,
@@ -9,16 +8,22 @@ CREATE TABLE IF NOT EXISTS Server (
 
 CREATE TABLE IF NOT EXISTS Message (
 	id INTEGER NOT NULL PRIMARY KEY,
+	fk_server_id INTEGER NOT NULL,
 	topic TEXT NOT NULL,
 	payload TEXT NOT NULL
+	FOREIGN KEY(fk_server_id)
+	REFERENCES Server(id)
+	ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Topic (
 	id INTEGER NOT NULL PRIMARY KEY,
 	fk_server_id INTEGER NOT NULL,
-	name TEXT NOT NULL,
+	name TEXT NOT NULL UNIQUE,
 	enabled BOOLEAN NOT NULL,
-	FOREIGN KEY(fk_server_id) REFERENCES Server(id)
+	FOREIGN KEY(fk_server_id)
+	REFERENCES Server(id)
+	ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Session (
@@ -26,6 +31,8 @@ CREATE TABLE IF NOT EXISTS Session (
 	fk_selected_server_id INTEGER, 
 	all_topics BOOLEAN NOT NULL,
 	connected BOOLEAN NOT NULL,
-	FOREIGN KEY(fk_selected_server_id) REFERENCES Server(id)
+	FOREIGN KEY(fk_selected_server_id)
+	REFERENCES Server(id)
+	ON DELETE CASCADE
 );
 
