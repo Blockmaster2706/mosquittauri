@@ -110,29 +110,50 @@ impl Server {
         let name = name.into();
         let url = url.into();
         log::info!("updating server {name}");
-        STORAGE.get_mut()?.edit(id, |server| {
-            server.name = name;
-            server.url = url;
-            server.port = port;
-            server.client_id = client_id.into();
-        })
+        let client_id = client_id.into();
+        let pool = POOL.get().await;
+        query!(
+            r#"
+            UPDATE Server
+            SET name = ?,
+            url = ?,
+            port = ?,
+            client_id = ?
+            WHERE id = ?
+            "#,
+            name,
+            url,
+            port,
+            client_id,
+            id
+        )
+        .execute(&*pool)
+        .await?;
+        Ok(())
     }
-    /*
-     * UPDATE Server
-     * SET name = {name},
-     * url = {url},
-     * port = {port},
-     * client_id = {client_id},
-     * WHERE id = {id};
-     */
 
     #[allow(dead_code)]
     pub async fn find_by_name(name: &str) -> Result<Self> {
-        Self::find_all()
-            .await?
-            .into_iter()
-            .find(|server| server.name == name)
-            .context(format!("No Server named {name} found"))
+        /*Self::find_all()
+        .await?
+        .into_iter()
+        .find(|server| server.name == name)
+        .context(format!("No Server named {name} found"));*/
+        todo!();
+        /*log::info!("find server by name");
+        let pool = POOL.get().await;
+        let servers = query!(
+            r#"
+            SELECT * FROM Server
+            WHERE name LIKE '%?%'
+            "#,
+            name
+        )
+        .fetch_optional(&*pool)
+        .await?
+        .map(|record| server_from_record!(record))
+        .context(format!("Unable to retrieve Server by name: {}", name))?;
+        Ok(servers)*/
     }
     /*
      * SELECT * FROM Server
