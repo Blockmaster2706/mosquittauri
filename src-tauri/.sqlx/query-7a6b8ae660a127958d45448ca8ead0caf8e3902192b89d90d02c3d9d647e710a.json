@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE Session\n            SET listen_all_topics = ?\n            WHERE id = 0\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "7a6b8ae660a127958d45448ca8ead0caf8e3902192b89d90d02c3d9d647e710a"
+}

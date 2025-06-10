@@ -8,7 +8,7 @@ use std::{
     thread::{spawn, JoinHandle},
     time::{Duration, Instant},
 };
-use tauri::async_runtime as tk;
+use tauri::async_runtime::{self as tk, block_on};
 
 use crate::model::Message;
 
@@ -69,7 +69,7 @@ impl MqttPool {
                         continue;
                     };
                     log::trace!("parsing publish packet");
-                    let msg = match publish.try_into() {
+                    let msg = match block_on(Message::try_from_publish(publish)) {
                         Ok(msg) => msg,
                         Err(e) => {
                             log::warn!("Failed to parse message: {e}");
