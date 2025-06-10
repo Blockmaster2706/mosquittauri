@@ -8,6 +8,8 @@ on:
       - sql
 
 # This workflow will trigger on each push to the `backend` or 'frontned' branch to automatically test, lint and format the code.
+env:
+  DATABASE_URL: "sqlite://msqt.sqlite"
 
 jobs:
   publish-tauri:
