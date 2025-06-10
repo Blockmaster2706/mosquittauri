@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo:rerun-if-changed=migrations");
     tauri_build::build()
     // prost_build::Config::new()
     //     .type_attribute(".event", "#[derive(serde::Serialize)]\n")

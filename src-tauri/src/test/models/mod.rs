@@ -1,20 +1,30 @@
-use std::{thread::sleep, time::Duration};
-
 use anyhow::{Context, Result};
+use tauri::async_runtime::block_on;
 
 use crate::model::{MsqtDao, MsqtDto, Server};
 
-fn print_servers() {
-    println!("{:?}", Server::find_all());
-}
-
 #[test]
-fn test_json_storage() -> Result<()> {
-    print_servers();
-    let server = Server::try_new("example", "example.com", 1883_u16, "client")
-        .context("Failed to add server")?;
-    print_servers();
-    sleep(Duration::from_secs(3));
-    Server::delete(server.id())?;
+fn test_storage() -> Result<()> {
+    // crate::test::init();
+
+    // Create server
+    let server = block_on(Server::try_new(
+        "example",
+        "example.com",
+        1883_u16,
+        "client",
+    ))
+    .context("Failed to add server")?;
+    assert_eq!(
+        block_on(Server::find_by_name("example"))
+            .ok()
+            .map(|server| server.id()),
+        Some(server.id())
+    );
+
+    assert_eq!(block_on(Server::find_all())?, vec![server.clone()]);
+
+    // Cleanup
+    block_on(Server::delete(server.id()))?;
     Ok(())
 }
