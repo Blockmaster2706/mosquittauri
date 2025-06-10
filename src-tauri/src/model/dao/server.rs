@@ -1,14 +1,9 @@
 use anyhow::{Context, Result};
 use sqlx::query;
 
-use crate::{
-    model::Server,
-    utils::{JsonStorageLock, POOL},
-};
+use crate::{model::Server, utils::POOL};
 
 use super::MsqtDao;
-
-static STORAGE: JsonStorageLock<Server> = JsonStorageLock::new("server");
 
 macro_rules! server_from_record {
     ($record: expr) => {

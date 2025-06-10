@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS Message (
 	fk_server_id INTEGER NOT NULL,
 	topic TEXT NOT NULL,
 	payload TEXT NOT NULL,
+	timestamp INTEGER NOT NULL,
 	FOREIGN KEY(fk_server_id)
 	REFERENCES Server(id)
 	ON DELETE CASCADE
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Topic (
 CREATE TABLE IF NOT EXISTS Session (
 	id INTEGER NOT NULL PRIMARY KEY,
 	fk_selected_server_id INTEGER, 
-	all_topics BOOLEAN NOT NULL,
+	listen_all_topics BOOLEAN NOT NULL,
 	connected BOOLEAN NOT NULL,
 	FOREIGN KEY(fk_selected_server_id)
 	REFERENCES Server(id)

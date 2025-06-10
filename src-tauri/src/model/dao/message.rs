@@ -1,11 +1,10 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use chrono::Local;
+use sqlx::query;
 
-use crate::{model::Message, utils::JsonStorageLock};
+use crate::{model::Message, utils::POOL};
 
 use super::MsqtDao;
-
-static STORAGE: JsonStorageLock<Message> = JsonStorageLock::new("message");
 
 macro_rules! message_from_record {
     ($record: expr) => {
@@ -14,6 +13,7 @@ macro_rules! message_from_record {
             fk_server_id: $record.fk_server_id as u32,
             topic: $record.topic,
             payload: $record.payload,
+            timestamp: $record.timestamp,
         }
     };
 }
@@ -24,7 +24,7 @@ impl MsqtDao for Message {
         let pool = POOL.get().await;
         let messages = query!(
             r#"
-            SELECT * FROM Messages
+            SELECT * FROM Message
             "#,
         )
         .fetch_all(&*pool)
@@ -39,7 +39,7 @@ impl MsqtDao for Message {
         let pool = POOL.get().await;
         let messages = query!(
             r#"
-            SELECT * FROM Messages
+            SELECT * FROM Message
             WHERE id = ?
             "#,
             id
@@ -59,10 +59,10 @@ impl Message {
         log::info!("adding topic {topic}");
         let record = query!(
             r#"
-            INSERT INTO Messages (fk_server_id, topic, payload, timestamp)
+            INSERT INTO Message (fk_server_id, topic, payload, timestamp)
             VALUES (?, ?, ?, ?)
-        RETURNING *;
-        "#,
+            RETURNING *;
+            "#,
             server_id,
             topic,
             payload,
@@ -70,6 +70,6 @@ impl Message {
         )
         .fetch_one(&*pool)
         .await?;
-        Ok(server_from_record!(record))
+        Ok(message_from_record!(record))
     }
 }

@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use anyhow::anyhow;
 use std::{
     fs,

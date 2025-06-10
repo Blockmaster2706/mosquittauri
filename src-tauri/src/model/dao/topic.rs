@@ -4,10 +4,8 @@ use sqlx::query;
 use super::MsqtDao;
 use crate::{
     model::{Session, Topic},
-    utils::{JsonStorageLock, POOL},
+    utils::POOL,
 };
-
-static STORAGE: JsonStorageLock<Topic> = JsonStorageLock::new("topic");
 
 macro_rules! topic_from_record {
     ($record: expr) => {
@@ -64,6 +62,7 @@ impl Topic {
             r#"
             INSERT INTO Topic (fk_server_id, name, enabled)
             VALUES (?, ?, 0)
+            RETURNING *
             "#,
             server_id,
             name
@@ -120,15 +119,16 @@ impl Topic {
             "#,
             server_id
         )
-        .fetch_optional(&*pool)
-        .await?
-        .map(|record| topic_from_record!(record))
+        .fetch_all(&*pool)
+        .await
         .context(format!(
             "Unable to retrieve Topics for Server with id: {}",
             server_id
-        ))?;
-        todo!();
-        //Ok(topics)
+        ))?
+        .into_iter()
+        .map(|record| topic_from_record!(record))
+        .collect();
+        Ok(topics)
     }
 
     pub async fn find_by_server(server_id: u32) -> Result<Vec<Topic>> {
