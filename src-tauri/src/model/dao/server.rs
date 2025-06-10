@@ -134,18 +134,12 @@ impl Server {
 
     #[allow(dead_code)]
     pub async fn find_by_name(name: &str) -> Result<Self> {
-        /*Self::find_all()
-        .await?
-        .into_iter()
-        .find(|server| server.name == name)
-        .context(format!("No Server named {name} found"));*/
-        todo!();
-        /*log::info!("find server by name");
+        log::info!("find server by name");
         let pool = POOL.get().await;
         let servers = query!(
             r#"
             SELECT * FROM Server
-            WHERE name LIKE '%?%'
+            WHERE name LIKE CONCAT('%',?,'%')
             "#,
             name
         )
@@ -153,10 +147,6 @@ impl Server {
         .await?
         .map(|record| server_from_record!(record))
         .context(format!("Unable to retrieve Server by name: {}", name))?;
-        Ok(servers)*/
+        Ok(servers)
     }
-    /*
-     * SELECT * FROM Server
-     * WHERE name LIKE '%{name}%';
-     */
 }
