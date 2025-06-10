@@ -1,17 +1,13 @@
-use std::{thread::sleep, time::Duration};
-
 use anyhow::{Context, Result};
 use tauri::async_runtime::block_on;
 
 use crate::model::{MsqtDao, MsqtDto, Server};
 
-fn print_servers() {
-    println!("{:?}", block_on(Server::find_all()));
-}
-
 #[test]
 fn test_storage() -> Result<()> {
-    print_servers();
+    // crate::test::init();
+
+    // Create server
     let server = block_on(Server::try_new(
         "example",
         "example.com",
@@ -19,8 +15,16 @@ fn test_storage() -> Result<()> {
         "client",
     ))
     .context("Failed to add server")?;
-    print_servers();
-    sleep(Duration::from_secs(3));
+    assert_eq!(
+        block_on(Server::find_by_name("example"))
+            .ok()
+            .map(|server| server.id()),
+        Some(server.id())
+    );
+
+    assert_eq!(block_on(Server::find_all())?, vec![server.clone()]);
+
+    // Cleanup
     block_on(Server::delete(server.id()))?;
     Ok(())
 }
