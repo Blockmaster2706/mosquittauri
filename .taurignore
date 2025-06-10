@@ -1,2 +1,4 @@
 msqt_data/
 *.log
+*.sqlite*
+*.bck

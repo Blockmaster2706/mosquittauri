@@ -1,7 +1,7 @@
 use std::{sync::atomic::Ordering, time::Duration};
 
 use anyhow::{Context, Result};
-use tauri::{AppHandle, Listener};
+use tauri::{async_runtime::block_on, AppHandle, Listener};
 
 use crate::{
     ipc::event::{
@@ -14,19 +14,22 @@ use crate::{
 
 #[tauri::command]
 pub async fn mqtt_connect(app: AppHandle) -> tauri::Result<()> {
-    if let Err(e) = mqtt_connect_internal(&app) {
+    if let Err(e) = mqtt_connect_internal(&app).await {
         MqttError::new(&e).send(&app);
         log::error!("Mqtt connect failed: {e}")
     }
     Ok(())
 }
 
-fn mqtt_connect_internal(app: &AppHandle) -> Result<()> {
+async fn mqtt_connect_internal(app: &AppHandle) -> Result<()> {
     let server_id = Session::get_or_init()
+        .await
         .context("Failed to get session")?
         .server_id()
         .context("failed to get selected server id")?;
-    let server = Server::find_by_id(server_id).context("Failed to get selected server")?;
+    let server = Server::find_by_id(server_id)
+        .await
+        .context("Failed to get selected server")?;
     let mut pool = MqttPool::new(server.get_mqtt_options());
     let running = pool.get_running_atomic();
     let running_disconnect = running.clone();
@@ -49,9 +52,11 @@ fn mqtt_connect_internal(app: &AppHandle) -> Result<()> {
 
     // Subscribe to all topics for selected server
     let topic_sender = pool.get_topic_sender();
-    if let Err(e) =
-        topic_sender.send(Topic::find_enabled_by_selected_server()?.context("No server selected")?)
-    {
+    if let Err(e) = topic_sender.send(
+        Topic::find_enabled_by_selected_server()
+            .await?
+            .context("No server selected")?,
+    ) {
         log::error!("Failed to subscribe to topics {e}")
     }
 
@@ -63,7 +68,7 @@ fn mqtt_connect_internal(app: &AppHandle) -> Result<()> {
                 return;
             }
         };
-        let topic = match Topic::find_by_id(state_event.id()) {
+        let topic = match block_on(Topic::find_by_id(state_event.id())) {
             Ok(topic) => topic,
             Err(e) => {
                 log::error!("Failed to get changed topic:  {e}");

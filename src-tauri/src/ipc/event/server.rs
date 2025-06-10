@@ -14,8 +14,8 @@ pub struct ServerUpdate {
 }
 impl ServerUpdate {
     const ID: &str = id::SERVER_UPDATE;
-    pub fn from_all(app: &AppHandle) -> tauri::Result<Self> {
-        let list = match Server::find_all() {
+    pub async fn from_all(app: &AppHandle) -> tauri::Result<Self> {
+        let list = match Server::find_all().await {
             Ok(list) => list,
             Err(e) => {
                 log::error!("Failed to get all servers {e}");
@@ -35,11 +35,11 @@ impl ServerUpdate {
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerSelected {
-    id: u64,
+    id: u32,
 }
 impl ServerSelected {
     const ID: &str = id::SERVER_SELECTED;
-    pub fn new(id: u64) -> Self {
+    pub fn new(id: u32) -> Self {
         Self { id }
     }
     pub fn send(&self, app: &AppHandle) {
