@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE Session\n            SET fk_selected_server_id = ?\n            WHERE id = 0\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "4e38d760475776500d981ed1e14de283337a43cf0c9e5961b24256f5f3bb316e"
+}

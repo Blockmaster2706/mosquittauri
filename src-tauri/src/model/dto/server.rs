@@ -3,10 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use super::MsqtDto;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, sqlx::FromRow, Eq, PartialEq, PartialOrd, Ord)]
 #[serde(rename_all = "camelCase")]
 pub struct Server {
-    pub(in crate::model) id: u64,
+    pub(in crate::model) id: u32,
     pub(in crate::model) name: String,
     pub(in crate::model) url: String,
     pub(in crate::model) port: u16,
@@ -14,7 +14,7 @@ pub struct Server {
 }
 
 impl MsqtDto for Server {
-    fn id(&self) -> u64 {
+    fn id(&self) -> u32 {
         self.id
     }
 }
