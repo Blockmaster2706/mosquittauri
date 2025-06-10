@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT * FROM Message\n            WHERE id = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "fk_server_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "topic",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "payload",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "timestamp",
+        "ordinal": 4,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a4fb9e00424ad8b40018643e6fce5267d497b02b076265d7422c1f450c48cc7a"
+}
