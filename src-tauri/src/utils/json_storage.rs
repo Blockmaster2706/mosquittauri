@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use anyhow::anyhow;
 use std::{
     fs,
@@ -86,10 +88,10 @@ impl<T: MsqtDto> JsonStorage<T> {
             Vec::new()
         })
     }
-    pub fn gen_id(&self) -> Result<u64> {
+    pub fn gen_id(&self) -> Result<u32> {
         Ok(Self::gen_id_from_data(&self.find_all()?))
     }
-    pub fn gen_id_from_data(data: &[T]) -> u64 {
+    pub fn gen_id_from_data(data: &[T]) -> u32 {
         let Some(last) = data.last() else {
             return 0;
         };
@@ -102,7 +104,7 @@ impl<T: MsqtDto> JsonStorage<T> {
         })?;
         Ok(())
     }
-    pub fn edit(&mut self, id: u64, action: impl FnOnce(&mut T)) -> Result<()> {
+    pub fn edit(&mut self, id: u32, action: impl FnOnce(&mut T)) -> Result<()> {
         self.update(|data| {
             action(
                 data.iter_mut()
@@ -113,7 +115,7 @@ impl<T: MsqtDto> JsonStorage<T> {
         })?;
         Ok(())
     }
-    pub fn delete(&mut self, id: u64) -> Result<()> {
+    pub fn delete(&mut self, id: u32) -> Result<()> {
         let name = self.name;
         self.update(|list| {
             let index = list

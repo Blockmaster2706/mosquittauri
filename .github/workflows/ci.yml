@@ -5,8 +5,11 @@ on:
     branches:
       - backend
       - frontend
+      - sql
 
 # This workflow will trigger on each push to the `backend` or 'frontned' branch to automatically test, lint and format the code.
+env:
+  DATABASE_URL: "sqlite://msqt.sqlite"
 
 jobs:
   publish-tauri:
@@ -80,6 +83,12 @@ jobs:
           key: ${{ runner.os }}-cargo-target-${{ hashFiles('./src-tauri/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-target-
+
+      - name: install sqlx cli
+        run: cargo install sqlx-cli
+
+      - name: setup database
+        run: cd ./src-tauri && cargo sqlx database setup
 
       - name: run tauri build
         run: yarn tauri build

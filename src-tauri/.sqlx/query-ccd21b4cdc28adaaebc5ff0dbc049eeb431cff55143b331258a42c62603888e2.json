@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE Server\n            SET name = ?,\n            url = ?,\n            port = ?,\n            client_id = ?\n            WHERE id = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "ccd21b4cdc28adaaebc5ff0dbc049eeb431cff55143b331258a42c62603888e2"
+}
