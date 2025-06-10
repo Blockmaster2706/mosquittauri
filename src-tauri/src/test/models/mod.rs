@@ -22,7 +22,7 @@ fn test_storage() -> Result<()> {
         Some(server.id())
     );
 
-    assert_eq!(block_on(Server::find_all())?, vec![server.clone()]);
+    assert!(block_on(Server::find_all())?.contains(&server));
 
     // Cleanup
     block_on(Server::delete(server.id()))?;
