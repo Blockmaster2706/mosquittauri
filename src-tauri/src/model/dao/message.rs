@@ -56,7 +56,7 @@ impl Message {
     pub async fn try_new(server_id: u32, topic: String, payload: String) -> Result<Self> {
         let timestamp = Local::now().timestamp();
         let pool = POOL.get().await;
-        log::info!("adding topic {topic}");
+        log::debug!("adding message with topic {topic}");
         let record = query!(
             r#"
             INSERT INTO Message (fk_server_id, topic, payload, timestamp)

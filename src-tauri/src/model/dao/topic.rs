@@ -91,9 +91,8 @@ impl Topic {
     }
 
     pub async fn set_enabled(topic_id: u32, enabled: bool) -> Result<()> {
-        //log::info!(format!("setting topic with id {} state to {}", topic_id, enabled));
+        log::info!("setting topic with id {} state to {}", topic_id, enabled);
         let pool = POOL.get().await;
-        //let enabled = enabled as i32;
         query!(
             r#"
             UPDATE Topic
@@ -154,7 +153,7 @@ impl Topic {
     }
 
     pub async fn find_enabled_by_selected_server() -> Result<Option<Vec<Topic>>> {
-        log::info!("getting topics for selected server");
+        log::info!("getting enabled topics for selected server");
         let Some(selected_server_id) = Session::get_or_init().await?.server_id() else {
             return Ok(None);
         };
