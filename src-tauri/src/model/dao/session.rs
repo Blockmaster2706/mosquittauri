@@ -31,7 +31,7 @@ impl MsqtDao for Session {
         Ok(sessions)
     }
     async fn find_by_id(id: u32) -> Result<Self> {
-        log::info!("find server by id");
+        log::info!("find session by id");
         let pool = POOL.get().await;
         let sessions = query!(
             r#"
@@ -70,7 +70,7 @@ impl Session {
         Ok(session_from_record!(record))
     }
     pub async fn select_server(server_id: u32) -> Result<()> {
-        log::info!("find selected server by server_id");
+        log::info!("set selected server by server_id");
         let pool = POOL.get().await;
         query!(
             r#"
