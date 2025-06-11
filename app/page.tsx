@@ -60,32 +60,32 @@ export default function Home() {
 			type MQTTPayload = {
 				topic?: string;
 				payload?: string;
-				timestamp?: number;
+				timestamp: string;
 			};
 
 			await listen<MQTTPayloadPayload>("mqtt-pull", (payload) => {
 				console.log("Received MQTT pull event:", payload);
 				if (!payload.payload || typeof payload.payload !== "object") {
-					console.error("Invalid MQTT payload received:", payload);
+					console.log("Invalid MQTT payload received:", payload);
 					return;
 				}
-				const mqttPayload = payload.payload.messages[0];
-				console.log("MQTT payload:", mqttPayload);
-				if (!mqttPayload.topic || !mqttPayload.payload) {
-					console.error("MQTT payload missing topic or payload:", mqttPayload);
-					return;
-				}
-				const message: message = {
-					topic: mqttPayload.topic,
-					message: mqttPayload.payload,
-					timestamp: mqttPayload.timestamp
-						? new Date(mqttPayload.timestamp).toLocaleTimeString()
-						: new Date().toLocaleTimeString(),
-				};
+				const messages = payload.payload.messages as MQTTPayload[];
+				messages.forEach((mqttPayload) => {
+					console.log("MQTT payload:", mqttPayload);
+					if (!mqttPayload.topic || !mqttPayload.payload) {
+						console.log("MQTT payload missing topic or payload:", mqttPayload);
+						return;
+					}
+					const message: message = {
+						topic: mqttPayload.topic,
+						message: mqttPayload.payload,
+						timestamp: mqttPayload.timestamp,
+					};
 
-				console.log("Received MQTT message:", payload);
+					console.log("Received MQTT message:", payload);
 
-				setMQTTMessageArray((prevState) => [...prevState, message]);
+					setMQTTMessageArray((prevState) => [...prevState, message]);
+				});
 			});
 		};
 
@@ -136,6 +136,7 @@ export default function Home() {
 							connected={isMQTTConnected}
 							setConnected={setIsMQTTConnected}
 							address={"change-me"}
+							setMessages={setMQTTMessageArray}
 						/>
 					</div>
 

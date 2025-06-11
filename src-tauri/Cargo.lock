@@ -102,6 +102,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "itertools",
  "log",
  "ntest",
  "prost",
@@ -115,7 +116,6 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-log",
  "test-context",
- "tokio",
 ]
 
 [[package]]

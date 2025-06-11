@@ -2,7 +2,10 @@ use anyhow::{Context, Result};
 use chrono::Local;
 use sqlx::query;
 
-use crate::{model::Message, utils::POOL};
+use crate::{
+    model::{Message, Session},
+    utils::POOL,
+};
 
 use super::MsqtDao;
 
@@ -53,10 +56,38 @@ impl MsqtDao for Message {
 }
 
 impl Message {
+    pub async fn find_by_server(server_id: u32) -> Result<Vec<Self>> {
+        log::info!("getting all messages by server");
+        let pool = POOL.get().await;
+        let messages = query!(
+            r#"
+            SELECT * FROM Message
+            WHERE fk_server_id = ?
+            "#,
+            server_id
+        )
+        .fetch_all(&*pool)
+        .await?
+        .into_iter()
+        .map(|record| message_from_record!(record))
+        .collect();
+        Ok(messages)
+    }
+    pub async fn find_by_enabled_server() -> Result<Vec<Self>> {
+        log::info!("getting all messages by selected server");
+        let server_id = Session::get_or_init()
+            .await?
+            .server_id()
+            .context("no server selected")?;
+        let messages = Self::find_by_server(server_id)
+            .await
+            .context(format!("Failed to get message for server {server_id}"))?;
+        Ok(messages)
+    }
     pub async fn try_new(server_id: u32, topic: String, payload: String) -> Result<Self> {
         let timestamp = Local::now().timestamp();
         let pool = POOL.get().await;
-        log::info!("adding topic {topic}");
+        log::debug!("adding message with topic {topic}");
         let record = query!(
             r#"
             INSERT INTO Message (fk_server_id, topic, payload, timestamp)
