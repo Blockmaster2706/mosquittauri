@@ -5,6 +5,7 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import commands from "../types/commands";
 import { EditIcon } from "../icons";
+import { message } from "../message-view";
 
 interface ServerListProps {
 	serverList: Server[];
@@ -12,6 +13,7 @@ interface ServerListProps {
 	setServerList: (value: Server[]) => void;
 	setServerToEdit: (value: Server) => void;
 	setEditMode: () => void;
+	setMessages: (value: message[]) => void;
 }
 
 export default function ServerList({
@@ -20,6 +22,7 @@ export default function ServerList({
 	setServerList,
 	setServerToEdit,
 	setEditMode,
+	setMessages,
 }: ServerListProps) {
 	useEffect(() => {
 		const unlisten = listen("server-update", (event) => {
@@ -61,9 +64,11 @@ export default function ServerList({
 								<button
 									className="ml-1 col-span-10 text-left"
 									title={server.url + ":" + server.port}
-									onClick={() =>
-										invoke(commands.select_server, { id: server.id })
-									}
+									onClick={() => {
+										invoke(commands.select_server, { id: server.id });
+										setMessages([]);
+										invoke(commands.get_messages);
+									}}
 								>
 									{server.name}
 								</button>
