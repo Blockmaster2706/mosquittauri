@@ -73,16 +73,13 @@ export default function Home() {
 				messages.forEach((mqttPayload) => {
 					console.log("MQTT payload:", mqttPayload);
 					if (!mqttPayload.topic || !mqttPayload.payload) {
-						console.log(
-							"MQTT payload missing topic or payload:",
-							mqttPayload,
-						);
+						console.log("MQTT payload missing topic or payload:", mqttPayload);
 						return;
 					}
 					const message: message = {
 						topic: mqttPayload.topic,
 						message: mqttPayload.payload,
-						timestamp: mqttPayload.timestamp
+						timestamp: mqttPayload.timestamp,
 					};
 
 					console.log("Received MQTT message:", payload);
