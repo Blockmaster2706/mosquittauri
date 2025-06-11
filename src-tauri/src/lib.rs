@@ -53,6 +53,7 @@ pub fn run() -> Result<()> {
             command::set_topic_enabled,
             command::is_listen_all_topics,
             command::set_listen_all_topics,
+            command::get_messages,
             command::mqtt_connect,
         ])
         .setup(|app| {

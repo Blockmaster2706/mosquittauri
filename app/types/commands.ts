@@ -11,6 +11,7 @@ enum commands {
 	set_topic_enabled = "set_topic_enabled",
 	is_listen_all_topics = "is_listen_all_topics",
 	set_listen_all_topics = "set_listen_all_topics",
+	get_messages = "get_messages",
 	mqtt_connect = "mqtt_connect",
 }
 export default commands;

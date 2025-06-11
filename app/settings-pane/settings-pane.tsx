@@ -11,6 +11,7 @@ import { invoke } from "@tauri-apps/api/core";
 import EditServer from "./edit-server";
 import commands from "../types/commands";
 import { emit, listen } from "@tauri-apps/api/event";
+import { message } from "../message-view";
 
 interface SettingsPageProps {
 	topicList: topic[];
@@ -18,6 +19,7 @@ interface SettingsPageProps {
 	address: string;
 	connected: boolean;
 	setConnected: Dispatch<SetStateAction<boolean>>;
+	setMessages: (value: message[]) => void;
 }
 
 enum Mode {
@@ -35,6 +37,7 @@ export default function SettingsPage({
 	topicList,
 	setTopicList,
 	connected,
+	setMessages,
 	address,
 }: SettingsPageProps) {
 	const themes = ["mosquittauri", "flashbang", "UwU"];
@@ -156,6 +159,7 @@ export default function SettingsPage({
 							setServerList={setServerList}
 							setServerToEdit={setServerToEdit}
 							setEditMode={() => setMode(Mode.EditServer)}
+							setMessages={setMessages}
 						/>
 					</div>
 
@@ -231,6 +235,7 @@ export default function SettingsPage({
 							handleClick={handleClick}
 							setAddTopicMode={() => setMode(Mode.AddTopic)}
 							onBackClick={() => {
+								setMessages([]);
 								setSelectedServerID(-1);
 								setMode(Mode.ServerList);
 							}}
